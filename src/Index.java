@@ -1,12 +1,15 @@
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -18,6 +21,10 @@ public class Index {
 		// create Document ArrayList
 		ArrayList<Document> docList = new ArrayList<Document>();
 
+		Map<String, LexiconNode> lexicon = new TreeMap<String, LexiconNode>(); //fixme
+		
+		List<LexiconNode> allLexiconValues = new ArrayList<LexiconNode>();
+
 		//Need commend line args.
 		
 		// 1.1 Parsing
@@ -25,6 +32,19 @@ public class Index {
 		
 		// 1.2 add stoplist
 		removeStopWords(docList);
+		
+		//1.3 (A) Lexicon
+		for (Document doc: docList) {
+			createLexicon(doc, lexicon); //Temp lexicon
+		}
+		
+		allLexiconValues.addAll(lexicon.values());
+		
+		 try {
+		saveLexicons(allLexiconValues, "lexicon");
+		 }  catch (IOException e) {
+			 //FIXME hanle errors here
+		 }
 		
 	}
 	
@@ -35,7 +55,8 @@ public class Index {
 	
 	// print sorted list
 	public static void printSortedList(ArrayList<Document> docList) {
-		for (Document doc: docList) {
+		for (Document doc: docList) {	
+			
 		System.out.println(doc.getDocNum());
 		List<String> list = new ArrayList<String>(doc.getMap().keySet());
 		Collections.sort(list);
@@ -51,7 +72,7 @@ public class Index {
 	//Parsing method
 	public static void mapDoc(ArrayList<Document> docList) {
 		try {
-			BufferedReader br = new BufferedReader(new FileReader("src/latimes-100"));
+			BufferedReader br = new BufferedReader(new FileReader("latimes-100"));
 		
 			// define Tag 
 			boolean openHeadlineTag = false;
@@ -138,7 +159,7 @@ public class Index {
 	
 	public static void removeStopWords(ArrayList<Document> docList) {
 		try {
-			BufferedReader br = new BufferedReader(new FileReader("src/stoplist"));
+			BufferedReader br = new BufferedReader(new FileReader("stoplist"));
 			ArrayList<String> stopList = new ArrayList<String>();
 			
 			while(true) {
@@ -156,12 +177,72 @@ public class Index {
 					doc.removeKey(stopWord);
 				}
 			}
-			printSortedList(docList);
+			//printSortedList(docList);
 
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	   private static void createLexicon(Document doc,
+		         Map<String, LexiconNode> lexicon) {   
+
+				List<String> list = new ArrayList<String>(doc.getMap().keySet());
+				Collections.sort(list);
+			
+				for (String key: list) {
+					LexiconNode lexiconTemp;
+
+					if (!lexicon.containsKey(key))
+						lexicon.put(key, new LexiconNode(key));
+					
+					//System.out.println("key 1: "+key);
+
+					lexiconTemp = lexicon.get(key);
+					lexiconTemp.insert(doc.getDocNum());
+				}
+		   }
+	   
+	   public static void saveInvertedLists(List<LexiconNode> lexicons, String file)
+			   throws IOException {
+		   
+
+		      BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+		      
+		      
+		      for (LexiconNode lexconNode : lexicons) {
+		    	  Collection<InvertedList> lexiconCollection = lexconNode.invlist.values();
+		    	  
+		         for (InvertedList current : lexiconCollection) {
+		        	 String documenId = current.getDocumentId();
+		        	 int counter = current.getCounter();
+		        	 writer.write(documenId+" "+counter);
+		         }
+
+		         writer.newLine();
+		      }
+		      writer.close();
+
+		   }
+	   
+	   public static void saveLexicons(List<LexiconNode> lexiconsList, String fileName)
+			   throws IOException {
+
+		      BufferedWriter writer = new BufferedWriter(new FileWriter(fileName));
+		      
+		      
+		      for (LexiconNode lexicon : lexiconsList) {
+		            writer.write(lexicon.getName()); //FIXME 
+		            writer.newLine();
+		         }
+		         writer.close();
+
+		   }
+	
+	public static void indexWords(ArrayList<Document> docList) {
+		//System.out.println(docList.get(0).getMap.get("a"));
+		
 	}
 }
