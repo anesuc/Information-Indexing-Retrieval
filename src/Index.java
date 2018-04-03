@@ -72,7 +72,7 @@ public class Index {
 	//Parsing method
 	public static void mapDoc(ArrayList<Document> docList) {
 		try {
-			BufferedReader br = new BufferedReader(new FileReader("latimes-100"));
+			BufferedReader br = new BufferedReader(new FileReader("src/latimes-100"));
 		
 			// define Tag 
 			boolean openHeadlineTag = false;
@@ -159,7 +159,7 @@ public class Index {
 	
 	public static void removeStopWords(ArrayList<Document> docList) {
 		try {
-			BufferedReader br = new BufferedReader(new FileReader("stoplist"));
+			BufferedReader br = new BufferedReader(new FileReader("src/stoplist"));
 			ArrayList<String> stopList = new ArrayList<String>();
 			
 			while(true) {
