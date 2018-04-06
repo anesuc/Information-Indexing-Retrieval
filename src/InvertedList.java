@@ -3,6 +3,7 @@ public class InvertedList {
 	
 	   private String documentId;
 	   private int counter = 0;
+	   private int pointer  = 0; //FIXME
 	
 	public InvertedList(String docId) {
 	      this.documentId = docId;
@@ -13,6 +14,10 @@ public class InvertedList {
 	   }
 	
 	public int getCounter() {
+	      return counter;
+	   }
+	
+	public int getPointer() {
 	      return counter;
 	   }
 	

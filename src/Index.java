@@ -191,12 +191,17 @@ public class Index {
 
 				List<String> list = new ArrayList<String>(doc.getMap().keySet());
 				Collections.sort(list);
+				
+				int lexiconPointer = 0;
 			
 				for (String key: list) {
 					LexiconNode lexiconTemp;
+					
 
-					if (!lexicon.containsKey(key))
-						lexicon.put(key, new LexiconNode(key));
+					if (!lexicon.containsKey(key)) {
+						lexicon.put(key, new LexiconNode(key, lexiconPointer));
+						//lexiconPointer++; This was wrong implementation HELP needed lol
+					}
 					
 					//System.out.println("key 1: "+key);
 
@@ -234,7 +239,7 @@ public class Index {
 		      
 		      
 		      for (LexiconNode lexicon : lexiconsList) {
-		            writer.write(lexicon.getName()); //FIXME 
+		            writer.write(lexicon.getTerm()+" : "+lexicon.getPointer()); //FIXME 
 		            writer.newLine();
 		         }
 		         writer.close();
