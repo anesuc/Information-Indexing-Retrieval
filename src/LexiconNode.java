@@ -27,7 +27,7 @@ public class LexiconNode {
 	   public void insert(String documentID) {
 		   
 	      if (!invertedList.containsKey(documentID)) {
-	    	  InvertedList list = new InvertedList(documentID, pointer);
+	    	  InvertedList list = new InvertedList(pointer);
 	    	  invertedList.put(documentID, list);
 	      } else {
 	    	  InvertedList list = invertedList.get(documentID);
