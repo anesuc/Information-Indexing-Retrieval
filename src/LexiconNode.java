@@ -1,16 +1,15 @@
-import java.util.SortedMap;
-import java.util.TreeMap;
+import java.util.*;
 
 public class LexiconNode {
 
 	   private String term;
+	   private SortedMap<String, InvertedList> invertedList;
 	   private int pointer;
-	   SortedMap<String, InvertedList> invlist;
 	
 	   public LexiconNode(String term, int pointer) {
 		      this.term = term;
 		      this.pointer = pointer;
-		      this.invlist = new TreeMap<String, InvertedList>();
+		      this.invertedList = new TreeMap<String, InvertedList>();
 		   }
 	   
 		public String getTerm() {
@@ -20,14 +19,20 @@ public class LexiconNode {
 		public int getPointer() {
 		      return pointer;
 		   }
+		
+		public Collection<InvertedList> getInvertedListValues() {
+		      return invertedList.values();
+		   }
 
 	   public void insert(String documentID) {
-		   InvertedList list = new InvertedList(documentID);
 		   
-	      if (!invlist.containsKey(documentID)) {
-	    	  invlist.put(documentID, list);
+	      if (!invertedList.containsKey(documentID)) {
+	    	  InvertedList list = new InvertedList(documentID, pointer);
+	    	  invertedList.put(documentID, list);
+	      } else {
+	    	  InvertedList list = invertedList.get(documentID);
+	    	  list.addToCounter();
 	      }
-	      list.addToCounter();
 	   }
 	   
 	   

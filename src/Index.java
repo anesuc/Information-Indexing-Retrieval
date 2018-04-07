@@ -200,7 +200,7 @@ public class Index {
 
 					if (!lexicon.containsKey(key)) {
 						lexicon.put(key, new LexiconNode(key, lexiconPointer));
-						//lexiconPointer++; This was wrong implementation HELP needed lol
+						//lexiconPointer++; //This was wrong implementation HELP needed lol
 					}
 					
 					//System.out.println("key 1: "+key);
@@ -218,7 +218,7 @@ public class Index {
 		      
 		      
 		      for (LexiconNode lexconNode : lexicons) {
-		    	  Collection<InvertedList> lexiconCollection = lexconNode.invlist.values();
+		    	  Collection<InvertedList> lexiconCollection = lexconNode.getInvertedListValues();
 		    	  
 		         for (InvertedList current : lexiconCollection) {
 		        	 String documenId = current.getDocumentId();

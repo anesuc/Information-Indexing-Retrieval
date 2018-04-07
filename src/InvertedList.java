@@ -5,8 +5,9 @@ public class InvertedList {
 	   private int counter = 0;
 	   private int pointer  = 0; //FIXME
 	
-	public InvertedList(String docId) {
+	public InvertedList(String docId, int pointer) {
 	      this.documentId = docId;
+	      
 	   }
 	
 	public void addToCounter() {
