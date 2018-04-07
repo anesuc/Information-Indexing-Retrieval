@@ -3,12 +3,12 @@ import java.util.*;
 public class LexiconNode {
 
 	   private String term;
-	   private SortedMap<String, InvertedList> invertedList;
+	   SortedMap<Integer, InvertedList> invertedList;
 	   private int pointer;
 	
 	   public LexiconNode(String term) {
 		      this.term = term;
-		      this.invertedList = new TreeMap<String, InvertedList>();
+		      this.invertedList = new TreeMap<Integer, InvertedList>();
 		   }
 	   
 		public String getTerm() {
@@ -27,10 +27,10 @@ public class LexiconNode {
 		      return invertedList.values();
 		   }
 
-	   public void insert(String documentID) {
+	   public void insert(int documentID) {
 		   
 	      if (!invertedList.containsKey(documentID)) {
-	    	  InvertedList list = new InvertedList(pointer);
+	    	  InvertedList list = new InvertedList(documentID); //Give document ID to the inverted list because we need it later on when saving to the lexicon file
 	    	  invertedList.put(documentID, list);
 	      } else {
 	    	  InvertedList list = invertedList.get(documentID);

@@ -33,18 +33,19 @@ public class Index {
 		// 1.2 add stoplist
 		removeStopWords(docList);
 		
-		//1.3 (A) Lexicon
-		for (Document doc: docList) {
+		//1.3 inverted list and lexicons
+		/*for (Document doc: docList) {
 			createLexicon(doc, lexicon); //Temp lexicon
 		}
 		
 		allLexiconValues.addAll(lexicon.values());
 		
 		 try {
-		saveLexicons(allLexiconValues, "lexicon");
+			 saveInvertedLists(allLexiconValues, "invlist.txt"); //Save inverted list and also set pointers
+			 saveLexicons(allLexiconValues, "lexicon.txt");//FIXME Remove .txt before submission
 		 }  catch (IOException e) {
-			 //FIXME hanle errors here
-		 }
+			 //FIXME handle errors here
+		 }*/
 		
 	}
 	
@@ -204,7 +205,7 @@ public class Index {
 					//System.out.println("key 1: "+key);
 
 					lexiconTemp = lexicon.get(key);
-					lexiconTemp.insert(doc.getDocNum());
+					//lexiconTemp.insert(doc.getDocNum()); //ADD ID HERE FIXME
 				}
 		   }
 	   
@@ -213,18 +214,22 @@ public class Index {
 		   
 
 		      BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+		      int pointerLocation = 0;
 		      
 		      
 		      for (LexiconNode lexconNode : lexicons) {
 		    	  Collection<InvertedList> lexiconCollection = lexconNode.getInvertedListValues();
+		    	  lexconNode.setPointer(pointerLocation); //Setting pointer to the file offset position as stated in the requirements
 		    	  
 		         for (InvertedList current : lexiconCollection) {
-		        	 String documenId = current.getDocumentId();
+		        	 int documenId = current.getDocumentId();
 		        	 int counter = current.getCounter();
-		        	 writer.write(documenId+" "+counter);
+		        	 writer.write(documenId+" "+counter+" ");
 		         }
-
+		         
+		         writer.write(lexconNode.invertedList.size()); //Use this to know how many documents this lexicon is in etc
 		         writer.newLine();
+		         pointerLocation++; //Increasing pointer to next line
 		      }
 		      writer.close();
 

@@ -1,13 +1,11 @@
 
 public class InvertedList {
 	
-	   private String documentId;
+	   private int documentId;
 	   private int counter = 0;
-	   private int pointer  = 0; //FIXME
 	
-	public InvertedList(int pointer) {
-		this.pointer = pointer;
-	      
+	public InvertedList(int documentId) {
+	      this.documentId = documentId;
 	   }
 	
 	public void addToCounter() {
@@ -22,7 +20,7 @@ public class InvertedList {
 	      return counter;
 	   }
 	
-	public String getDocumentId() {
+	public int getDocumentId() {
 	      return documentId;
 	   }
 
