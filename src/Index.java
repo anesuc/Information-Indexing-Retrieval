@@ -33,6 +33,13 @@ public class Index {
 		// 1.2 add stoplist
 		removeStopWords(docList);
 		
+		try {
+			saveMap(docList, "map.txt");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		//1.3 inverted list and lexicons
 		/*for (Document doc: docList) {
 			createLexicon(doc, lexicon); //Temp lexicon
@@ -52,6 +59,19 @@ public class Index {
 	//clean up the word and transfer to lowercase
 	public static String cleanString(String string) {
 		return string.replaceAll("^[^a-zA-Z0-9\\s]+|[^a-zA-Z0-9\\s]+$", "").toLowerCase();
+	}
+	
+	
+	public static void saveMap(ArrayList<Document> docList, String file) 
+			throws IOException {
+		
+		BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+		
+		for (Document doc: docList) {
+			writer.write(doc.getDocID() + " " + doc.getDocNum());
+			writer.newLine();
+		}
+		writer.close();
 	}
 	
 	// print sorted list
@@ -99,7 +119,7 @@ public class Index {
 				Pattern pattern = Pattern.compile("<DOCNO>(.*?)</DOCNO>");
 				Matcher m = pattern.matcher(line);
 				if(m.find()){
-					Document currentDoc = new Document(m.group(1).replaceAll(" ", ""));
+					Document currentDoc = new Document(m.group(1).replaceAll(" ", ""), docList.size());
 					docList.add(currentDoc);
 				}
 				
@@ -149,7 +169,7 @@ public class Index {
 				}
 			}
 			
-//			printSortedList(docList);
+			printSortedList(docList);
 
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();

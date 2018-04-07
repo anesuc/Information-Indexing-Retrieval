@@ -4,14 +4,20 @@ import java.util.Map;
 public class Document {
 	private String docNum;
 	private Map<String, Integer> dict;
+	private int docID;
 	
-	public Document (String docNum) {
+	public Document (String docNum, int docID) {
 		this.docNum = docNum;
 		this.dict = new HashMap<String, Integer>();
+		this.docID = docID;
 	}
 	
 	public String getDocNum () {
 		return docNum;
+	}
+	
+	public int getDocID () {
+		return docID;
 	}
 	
 	public void addWord(String word) {
