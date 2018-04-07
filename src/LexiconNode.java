@@ -6,9 +6,8 @@ public class LexiconNode {
 	   private SortedMap<String, InvertedList> invertedList;
 	   private int pointer;
 	
-	   public LexiconNode(String term, int pointer) {
+	   public LexiconNode(String term) {
 		      this.term = term;
-		      this.pointer = pointer;
 		      this.invertedList = new TreeMap<String, InvertedList>();
 		   }
 	   
@@ -16,9 +15,13 @@ public class LexiconNode {
 		      return term;
 		   }
 		
+		public void setPointer(int pointer) {
+			this.pointer = pointer;
+		   }
+		
 		public int getPointer() {
 		      return pointer;
-		   }
+		   }		
 		
 		public Collection<InvertedList> getInvertedListValues() {
 		      return invertedList.values();
