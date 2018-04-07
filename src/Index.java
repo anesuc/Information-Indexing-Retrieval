@@ -41,7 +41,7 @@ public class Index {
 		}
 		
 		//1.3 inverted list and lexicons
-		/*for (Document doc: docList) {
+		for (Document doc: docList) {
 			createLexicon(doc, lexicon); //Temp lexicon
 		}
 		
@@ -52,7 +52,7 @@ public class Index {
 			 saveLexicons(allLexiconValues, "lexicon.txt");//FIXME Remove .txt before submission
 		 }  catch (IOException e) {
 			 //FIXME handle errors here
-		 }*/
+		 }
 		
 	}
 	
@@ -215,17 +215,19 @@ public class Index {
 				
 			
 				for (String key: list) {
-					LexiconNode lexiconTemp;
 					
 
 					if (!lexicon.containsKey(key)) {
-						lexicon.put(key, new LexiconNode(key));
+						LexiconNode lexNode = new LexiconNode(key, doc.getDocID()); //instantly insert docID since we are going to do that anyway
+						lexicon.put(key, lexNode);
+					} else {
+						LexiconNode lexNode = lexicon.get(key);
+						lexNode.insert(doc.getDocID());
 					}
 					
 					//System.out.println("key 1: "+key);
 
-					lexiconTemp = lexicon.get(key);
-					//lexiconTemp.insert(doc.getDocNum()); //ADD ID HERE FIXME
+					
 				}
 		   }
 	   
@@ -240,6 +242,7 @@ public class Index {
 		      for (LexiconNode lexconNode : lexicons) {
 		    	  Collection<InvertedList> lexiconCollection = lexconNode.getInvertedListValues();
 		    	  lexconNode.setPointer(pointerLocation); //Setting pointer to the file offset position as stated in the requirements
+		    	  writer.write(lexconNode.invertedList.size()+" "); //How many documents it occurs in the collection
 		    	  
 		         for (InvertedList current : lexiconCollection) {
 		        	 int documenId = current.getDocumentId();
@@ -247,7 +250,7 @@ public class Index {
 		        	 writer.write(documenId+" "+counter+" ");
 		         }
 		         
-		         writer.write(lexconNode.invertedList.size()); //Use this to know how many documents this lexicon is in etc
+		         
 		         writer.newLine();
 		         pointerLocation++; //Increasing pointer to next line
 		      }
@@ -262,7 +265,7 @@ public class Index {
 		      
 		      
 		      for (LexiconNode lexicon : lexiconsList) {
-		            writer.write(lexicon.getTerm()+" : "+lexicon.getPointer()); //FIXME 
+		            writer.write(lexicon.getTerm()+" "+lexicon.getPointer()); //FIXME 
 		            writer.newLine();
 		         }
 		         writer.close();

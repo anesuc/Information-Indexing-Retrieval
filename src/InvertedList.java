@@ -2,7 +2,7 @@
 public class InvertedList {
 	
 	   private int documentId;
-	   private int counter = 0;
+	   private int counter = 1; //initial addition would be  = 1
 	
 	public InvertedList(int documentId) {
 	      this.documentId = documentId;

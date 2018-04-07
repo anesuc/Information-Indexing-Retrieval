@@ -6,9 +6,10 @@ public class LexiconNode {
 	   SortedMap<Integer, InvertedList> invertedList;
 	   private int pointer;
 	
-	   public LexiconNode(String term) {
+	   public LexiconNode(String term, int documentID) {
 		      this.term = term;
 		      this.invertedList = new TreeMap<Integer, InvertedList>();
+		      insert(documentID); //Insert initial documentID inverted List
 		   }
 	   
 		public String getTerm() {
@@ -36,6 +37,7 @@ public class LexiconNode {
 	    	  InvertedList list = invertedList.get(documentID);
 	    	  list.addToCounter();
 	      }
+	      
 	   }
 	   
 	   
