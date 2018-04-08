@@ -21,7 +21,7 @@ public class search {
 		loadLexicons(lexiconMap, "lexicon.txt");
 		loadMap(map, "map.txt");
 		
-		String[] searchTerms = {"1,001"};
+		String[] searchTerms = {"1"};
 		
 		search(searchTerms, lexiconMap, map,"invlist.txt");
 

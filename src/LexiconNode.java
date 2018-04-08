@@ -9,8 +9,10 @@ public class LexiconNode {
 	   public LexiconNode(String term, int documentID) {
 		      this.term = term;
 		      this.invertedList = new TreeMap<Integer, InvertedList>();
-		      if ( documentID != -1)
-		    	  insert(documentID); //Insert initial documentID inverted List
+		      if ( documentID != -1) {
+		    	  insert(documentID); //This is not necessary anymore. But we are using it anyway incase we need it later on
+		      }
+		    	   
 		   }
 	   
 		public String getTerm() {
@@ -28,7 +30,8 @@ public class LexiconNode {
 		public Collection<InvertedList> getInvertedListValues() {
 		      return invertedList.values();
 		   }
-
+		
+		/*Not used anymore as frequency is already calculated prior to addition*/
 	   public void insert(int documentID) {
 		   
 	      if (!invertedList.containsKey(documentID)) {

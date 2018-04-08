@@ -41,8 +41,10 @@ public class Index {
 		}
 		
 		//1.3 inverted list and lexicons
+		Boolean oneWord = false;
 		for (Document doc: docList) {
-			createLexicon(doc, lexicon); //Temp lexicon
+			createLexicon(doc, lexicon, oneWord); //Temp lexicon
+			oneWord = true;
 		}
 		
 		allLexiconValues.addAll(lexicon.values());
@@ -76,6 +78,9 @@ public class Index {
 	
 	// print sorted list
 	public static void printSortedList(ArrayList<Document> docList) {
+		
+		
+		
 		for (Document doc: docList) {	
 			
 		System.out.println(doc.getDocNum());
@@ -87,7 +92,8 @@ public class Index {
 			System.out.println(key + " " + value);
 		}
 			System.out.println();
-		}	
+		
+		}
 	}
 	
 	//Parsing method
@@ -169,7 +175,7 @@ public class Index {
 				}
 			}
 			
-			printSortedList(docList);
+			//printSortedList(docList);
 
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -198,7 +204,7 @@ public class Index {
 					doc.removeKey(stopWord);
 				}
 			}
-			//printSortedList(docList);
+			printSortedList(docList);
 
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -208,7 +214,7 @@ public class Index {
 	}
 	
 	   private static void createLexicon(Document doc,
-		         Map<String, LexiconNode> lexicon) {   
+		         Map<String, LexiconNode> lexicon, Boolean oneWord) {   
 
 				List<String> list = new ArrayList<String>(doc.getMap().keySet());
 				Collections.sort(list);
@@ -216,16 +222,24 @@ public class Index {
 			
 				for (String key: list) {
 					
+					
 
 					if (!lexicon.containsKey(key)) {
+						int frequency = doc.getMap().get(key);
 						LexiconNode lexNode = new LexiconNode(key, doc.getDocID()); //instantly insert docID since we are going to do that anyway
+						InvertedList docList = lexNode.invertedList.get(doc.getDocID());
+						docList	.setCounter(frequency); // We can now set the frequency directly
 						lexicon.put(key, lexNode);
+						//System.out.println("key 1: "+key+" doc.getDocID(): "+doc.getDocID());
 					} else {
 						LexiconNode lexNode = lexicon.get(key);
 						lexNode.insert(doc.getDocID());
+						//System.out.println("key 2: "+key+" doc.getDocID(): "+doc.getDocID());
 					}
 					
-					//System.out.println("key 1: "+key);
+					
+					
+					
 
 					
 				}
