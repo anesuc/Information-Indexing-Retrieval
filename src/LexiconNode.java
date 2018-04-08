@@ -31,16 +31,12 @@ public class LexiconNode {
 		      return invertedList.values();
 		   }
 		
-		/*Not used anymore as frequency is already calculated prior to addition*/
-	   public void insert(int documentID) {
+		public void insert(int documentID) {
 		   
-	      if (!invertedList.containsKey(documentID)) {
+			if (!invertedList.containsKey(documentID)) {
 	    	  InvertedList list = new InvertedList(documentID); //Give document ID to the inverted list because we need it later on when saving to the lexicon file
 	    	  invertedList.put(documentID, list);
-	      } else {
-	    	  InvertedList list = invertedList.get(documentID);
-	    	  list.addToCounter();
-	      }
+	      } 
 	      
 	   }
 	   

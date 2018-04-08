@@ -61,20 +61,18 @@ public class index {
 			throw new IllegalArgumentException("Could not determine the source file from the arguments");
 		
 		
-		
-		// create Document ArrayList
+		// create Document ArrayList, Map lexicon and List allLexiconValues
 		ArrayList<Document> docList = new ArrayList<Document>();
 
 		Map<String, LexiconNode> lexicon = new TreeMap<String, LexiconNode>();  //lexicons list
 		
 		List<LexiconNode> allLexiconValues = new ArrayList<LexiconNode>();
 
-		//Need commend line args.
 		
 		// 1.1 Parsing
 		mapDoc(sourcefile, docList);
 		
-		// 1.2 add stoplist
+		// 1.2 Stoplist
 		if(!stoplist.equals(""))
 			removeStopWords(stoplist, docList);
 		
@@ -105,9 +103,7 @@ public class index {
 	}
 	
 	/**  
-	    * Saves document mapping data to file
-	    * @param docList - the document list array with filters terms from the stop list etc
-	    * @param file - file name to save the mapping data to
+	    * Replace all the string to plain lowercase word, which has no prefix and postfix punctuation and etc.
 	    */
 	public static String cleanString(String string) {
 		return string.replaceAll("^[^a-zA-Z0-9\\s]+|[^a-zA-Z0-9\\s]+$", "").toLowerCase();
@@ -129,8 +125,6 @@ public class index {
 		}
 		writer.close();
 	}
-	
-	// print sorted list
 	
 	/**  
 	    * Prints the sorted list to console
@@ -287,84 +281,78 @@ public class index {
 	    * @param doc - current document being processed
 	    * @param lexicon - lexicon list
 	    */
-	   private static void createLexicon(Document doc, Map<String, LexiconNode> lexicon) {   
+	private static void createLexicon(Document doc, Map<String, LexiconNode> lexicon) {   
 
-				List<String> list = new ArrayList<String>(doc.getMap().keySet());
-				Collections.sort(list);
+		List<String> list = new ArrayList<String>(doc.getMap().keySet());
+		Collections.sort(list);
 				
 			
-				for (String key: list) {
+			for (String key: list) {
 
-					if (!lexicon.containsKey(key)) {
-						int frequency = doc.getMap().get(key);
-						LexiconNode lexNode = new LexiconNode(key, doc.getDocID()); //instantly insert docID since we are going to do that anyway
-						InvertedList docList = lexNode.invertedList.get(doc.getDocID());
-						docList	.setCounter(frequency); // We can now set the frequency directly
-						lexicon.put(key, lexNode);
-					} else {
-						LexiconNode lexNode = lexicon.get(key);
-						lexNode.insert(doc.getDocID());
-						int frequency = doc.getMap().get(key);
-						InvertedList docList = lexNode.invertedList.get(doc.getDocID());
-						docList.setCounter(frequency); // We can now set the frequency directly
-					}
-					
-					
-					
-					
-
-					
+				if (!lexicon.containsKey(key)) {
+					int frequency = doc.getMap().get(key);
+					LexiconNode lexNode = new LexiconNode(key, doc.getDocID()); //instantly insert docID since we are going to do that anyway
+					InvertedList docList = lexNode.invertedList.get(doc.getDocID());
+					docList	.setCounter(frequency); // We can now set the frequency directly
+					lexicon.put(key, lexNode);
+				} else {
+					LexiconNode lexNode = lexicon.get(key);
+					lexNode.insert(doc.getDocID());
+					int frequency = doc.getMap().get(key);
+					InvertedList docList = lexNode.invertedList.get(doc.getDocID());
+					docList.setCounter(frequency); // We can now set the frequency directly
 				}
-		   }
+					
+			}
+	}
 	   
 	   /**  
 	    * Saves inverted list file
 	    * @param lexicons - lexicon list
 	    * @param file - file name/location to save the lexicon
 	    */
-	   public static void saveInvertedLists(List<LexiconNode> lexicons, String file)
+	public static void saveInvertedLists(List<LexiconNode> lexicons, String file)
 			   throws IOException {
 		   
 
-		      BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-		      int pointerLocation = 0;
-		      
-		      
-		      for (LexiconNode lexconNode : lexicons) {
-		    	  Collection<InvertedList> lexiconCollection = lexconNode.getInvertedListValues();
-		    	  lexconNode.setPointer(pointerLocation); //Setting pointer to the file offset position as stated in the requirements
-		    	  writer.write(Integer.toBinaryString(lexconNode.invertedList.size())+" "); //How many documents it occurs in the collection
+		BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+		int pointerLocation = 0;
+		       
+			for (LexiconNode lexconNode : lexicons) {
+				Collection<InvertedList> lexiconCollection = lexconNode.getInvertedListValues();
+		    	lexconNode.setPointer(pointerLocation); //Setting pointer to the file offset position as stated in the requirements
+		    	writer.write(Integer.toBinaryString(lexconNode.invertedList.size())+" "); //How many documents it occurs in the collection
 		    	  
-		         for (InvertedList current : lexiconCollection) {
-		        	 int documenId = current.getDocumentId();
-		        	 int counter = current.getCounter();
-		        	 writer.write(Integer.toBinaryString(documenId)+" "+Integer.toBinaryString(counter)+" ");
-		         }
+		    for (InvertedList current : lexiconCollection) {
+		    	int documenId = current.getDocumentId();
+		        int counter = current.getCounter();
+		        writer.write(Integer.toBinaryString(documenId)+" "+Integer.toBinaryString(counter)+" ");
+		    }
 		         
 		         
-		         writer.newLine();
-		         pointerLocation++; //Increasing pointer to next line
-		      }
-		      writer.close();
+		    	writer.newLine();
+		        pointerLocation++; //Increasing pointer to next line
+		    }
+			writer.close();
 
-		   }
+	}
 	   
 	   /**  
 	    * Saves lexicon file
 	    * @param lexicons - lexicon list
 	    * @param file - file name/location to save the lexicon
 	    */
-	   public static void saveLexicons(List<LexiconNode> lexiconsList, String fileName)
+	public static void saveLexicons(List<LexiconNode> lexiconsList, String fileName)
 			   throws IOException {
 
-		      BufferedWriter writer = new BufferedWriter(new FileWriter(fileName));
+		BufferedWriter writer = new BufferedWriter(new FileWriter(fileName));
 		      
 		      
-		      for (LexiconNode lexicon : lexiconsList) {
-		            writer.write(lexicon.getTerm()+" "+lexicon.getPointer());
-		            writer.newLine();
-		         }
-		         writer.close();
+		for (LexiconNode lexicon : lexiconsList) {
+			writer.write(lexicon.getTerm()+" "+lexicon.getPointer());
+			writer.newLine();
+		}
+		writer.close();
 
-		   }
+	}
 }

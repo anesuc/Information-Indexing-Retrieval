@@ -20,6 +20,7 @@ public class Document {
 		return docID;
 	}
 	
+	// Within-document frequency
 	public void addWord(String word) {
 		if (dict.get(word) == null) {
 			dict.put(word, 1);

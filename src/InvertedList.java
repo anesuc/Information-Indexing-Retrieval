@@ -8,10 +8,6 @@ public class InvertedList {
 	      this.documentId = documentId;
 	   }
 	
-	public void addToCounter() {
-	      this.counter++;
-	   }
-	
 	public void setCounter(int counter) {
 	      this.counter = counter;
 	   }
