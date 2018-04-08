@@ -232,8 +232,6 @@ public class index {
 					openTextTag = true;
 				}
 			}
-			
-			//printSortedList(docList);
 
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();

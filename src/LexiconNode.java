@@ -7,13 +7,13 @@ public class LexiconNode {
 	   private int pointer;
 	
 	   public LexiconNode(String term, int documentID) {
-		      this.term = term;
-		      this.invertedList = new TreeMap<Integer, InvertedList>();
-		      if ( documentID != -1) {
-		    	  insert(documentID); //This is not necessary anymore. But we are using it anyway incase we need it later on
-		      }
-		    	   
-		   }
+		      
+		   this.term = term;
+		   this.invertedList = new TreeMap<Integer, InvertedList>();
+		   if ( documentID != -1) {
+			   insert(documentID); 
+		   }  
+		}
 	   
 		public String getTerm() {
 		      return term;
@@ -34,7 +34,7 @@ public class LexiconNode {
 		public void insert(int documentID) {
 		   
 			if (!invertedList.containsKey(documentID)) {
-	    	  InvertedList list = new InvertedList(documentID); //Give document ID to the inverted list because we need it later on when saving to the lexicon file
+	    	  InvertedList list = new InvertedList(documentID); //Give document ID to the inverted list
 	    	  invertedList.put(documentID, list);
 	      } 
 	      
