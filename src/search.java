@@ -48,6 +48,12 @@ public class search {
 
 	}
 	
+	/**  
+	    * Performs the search
+	    * @param map - contains the mapping information
+	    * @param lexicons - contains the lexicons information
+	    * @param fileLocation - file location that has the lexicon data
+	    */
 	public static void search(String[] terms, Map<String, LexiconNode>  lexicons, Map<Integer, String>  map, String invlistFileLocation) {
 		
 		LexiconNode currentLexicon;
@@ -81,12 +87,17 @@ public class search {
 			
 		
 		}  catch (IOException e) {
-			 //FIXME handle errors here
+			e.printStackTrace();
 		 }
 		}
 		
 	}
 	
+	/**  
+	    * Load lexicons from file into memory
+	    * @param lexicons - stores the lexicon information
+	    * @param fileLocation - file location that has the lexicon data
+	    */
 	public static void loadLexicons(Map<String, LexiconNode>  lexicons, String fileLocation) {
 		
 		String term; //Lexicon term
@@ -107,17 +118,12 @@ public class search {
 				
 				term = lexiconParts[0];
 				pointer = Integer.parseInt(lexiconParts[1]);
-				
-				//System.out.println("term: "+term+" pointer: "+pointer);
 			
-			if (!lexicons.containsKey(term)) {
+			
 				LexiconNode lexNode = new LexiconNode(term, -1);
 				lexNode.setPointer(pointer);
 				lexicons.put(term, lexNode);
-			} else {
-				//This should not happen
-				System.out.println("Debug: ERROR");
-			}
+		
 			}
 				
 			
@@ -129,6 +135,11 @@ public class search {
 		
 	}
 	
+	/**  
+	    * Load map file into memory
+	    * @param map - stores the mapping information
+	    * @param fileLocation - file location that has the mapping data
+	    */
 	public static void loadMap(Map<Integer, String>  map, String fileLocation) {
 		
 		String docNumber; //Lexicon term
@@ -149,8 +160,6 @@ public class search {
 				docId = Integer.parseInt(line.substring(0, line.indexOf(' ')));
 				docNumber = line.substring(line.indexOf(' ') + 1);
 				
-				//System.out.println("docId: "+docId+" pointer: "+docNumber);
-				
 				map.put(docId, docNumber);
 			}
 				
@@ -163,12 +172,16 @@ public class search {
 		
 	}
 	
+	/**  
+	    * Checks if file exists
+	    * @param filename - file name/location to check
+	    */
 	public static Boolean fileExists(String filename) {
 		File file = new File(filename);
 	    Boolean exists = file.exists();
 	    if (file.exists() && file.isFile())
 	    {
-	    	return true;
+	    	return true; //Yes the file exists!
 	    } else {
 	    	throw new IllegalArgumentException("File'"+filename+"' does not exist"); //May as well handle the errors here
 	    }
