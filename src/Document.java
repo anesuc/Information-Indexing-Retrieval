@@ -20,7 +20,11 @@ public class Document {
 		return docID;
 	}
 	
-	// Within-document frequency
+	/**  
+	    * Save within-document frequency
+	    * @param dict - the map that contains the word and within-document frequency
+	    * @param word - the item collected during processing
+	    */
 	public void addWord(String word) {
 		if (dict.get(word) == null) {
 			dict.put(word, 1);

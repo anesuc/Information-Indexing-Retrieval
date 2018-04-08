@@ -31,6 +31,11 @@ public class LexiconNode {
 		      return invertedList.values();
 		   }
 		
+		/**  
+		    * Add new documentID+frequency to invertedList 
+		    * @param documentID - the unique documentID 
+		    * @param invertedList - the list that contain DocumentID and frequency
+		    */
 		public void insert(int documentID) {
 		   
 			if (!invertedList.containsKey(documentID)) {
