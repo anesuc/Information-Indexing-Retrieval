@@ -1,5 +1,6 @@
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -18,6 +19,55 @@ public class Index {
 	
 	public static void main(String[] args) {
 		
+		String sourcefile = "";
+		String stoplist = "";
+		Boolean verbose = false; //Print the list?
+		
+		if (args.length < 1)
+			 throw new IllegalArgumentException("No source file detected. Please provide an source file.");
+		else if (args.length == 1) { //Only the source file was provided
+			File file = new File(args[0]);
+		    Boolean exists = file.exists();
+			if (file.exists() && file.isFile())
+		    {
+		    	sourcefile = args[0];
+		    } else {
+		    	throw new IllegalArgumentException("Source file'"+args[0]+"' does not exist");
+		    }
+		}
+		
+		int stopfilePosition = -1;
+		for (int i = 0; i < args.length; i++) {
+			
+			if (args[i].equals("-s")) {
+				stoplist = args[i+1];
+				stopfilePosition = i;
+			} else if (args[i].equals("-p")) {
+				verbose = true;
+			} else if (i != stopfilePosition) {
+				File file = new File(args[i]);
+			    Boolean exists = file.exists();
+			    if (file.exists() && file.isFile())
+			    {
+			    	sourcefile = args[i];
+			    } else {
+			    	throw new IllegalArgumentException("Source file'"+args[i]+"' does not exist");
+			    }
+			}
+	        
+		}
+		
+		System.out.println("Stop file: "+stoplist+" Print: "+verbose);
+		
+		verbose = true;
+		
+		if(sourcefile.equals(""))
+			throw new IllegalArgumentException("Could not determine the source file from the arguments");
+		
+		//System.out.println("Stop file: ");
+		
+		
+		
 		// create Document ArrayList
 		ArrayList<Document> docList = new ArrayList<Document>();
 
@@ -28,10 +78,14 @@ public class Index {
 		//Need commend line args.
 		
 		// 1.1 Parsing
-		mapDoc(docList);
+		mapDoc(sourcefile, docList);
 		
 		// 1.2 add stoplist
-		removeStopWords(docList);
+		if(!stoplist.equals(""))
+			removeStopWords(stoplist, docList);
+		
+		if (verbose)
+			printSortedList(docList);
 		
 		try {
 			saveMap(docList, "map.txt");
@@ -97,9 +151,9 @@ public class Index {
 	}
 	
 	//Parsing method
-	public static void mapDoc(ArrayList<Document> docList) {
+	public static void mapDoc(String sourcefile, ArrayList<Document> docList) {
 		try {
-			BufferedReader br = new BufferedReader(new FileReader("src/latimes-100"));
+			BufferedReader br = new BufferedReader(new FileReader(sourcefile));
 		
 			// define Tag 
 			boolean openHeadlineTag = false;
@@ -184,9 +238,9 @@ public class Index {
 		}
 	}
 	
-	public static void removeStopWords(ArrayList<Document> docList) {
+	public static void removeStopWords(String stoplistFilename, ArrayList<Document> docList) {
 		try {
-			BufferedReader br = new BufferedReader(new FileReader("src/stoplist"));
+			BufferedReader br = new BufferedReader(new FileReader(stoplistFilename));
 			ArrayList<String> stopList = new ArrayList<String>();
 			
 			while(true) {
@@ -204,7 +258,6 @@ public class Index {
 					doc.removeKey(stopWord);
 				}
 			}
-			//printSortedList(docList);
 
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -278,7 +331,7 @@ public class Index {
 		      
 		      
 		      for (LexiconNode lexicon : lexiconsList) {
-		            writer.write(lexicon.getTerm()+" "+lexicon.getPointer()); //FIXME 
+		            writer.write(lexicon.getTerm()+" "+lexicon.getPointer());
 		            writer.newLine();
 		         }
 		         writer.close();
