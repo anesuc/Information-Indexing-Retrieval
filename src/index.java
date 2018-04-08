@@ -14,7 +14,7 @@ import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Index {
+public class index {
 	
 	
 	public static void main(String[] args) {
@@ -39,12 +39,12 @@ public class Index {
 		int stopfilePosition = -1;
 		for (int i = 0; i < args.length; i++) {
 			
-			if (args[i].equals("-s")) {
+			if (args[i].equals("-s") && stoplist.equals("")) {
 				stoplist = args[i+1];
 				stopfilePosition = i;
 			} else if (args[i].equals("-p")) {
 				verbose = true;
-			} else if (i != stopfilePosition) {
+			} else if (i != stopfilePosition && sourcefile.equals("")) {
 				File file = new File(args[i]);
 			    Boolean exists = file.exists();
 			    if (file.exists() && file.isFile())
@@ -57,9 +57,9 @@ public class Index {
 	        
 		}
 		
-		System.out.println("Stop file: "+stoplist+" Print: "+verbose);
+		System.out.println("sourcefile: "+sourcefile+" Stop file: "+stoplist+" Print: "+verbose);
 		
-		verbose = true;
+		verbose = false;
 		
 		if(sourcefile.equals(""))
 			throw new IllegalArgumentException("Could not determine the source file from the arguments");

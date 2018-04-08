@@ -1,4 +1,5 @@
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
@@ -12,18 +13,39 @@ import java.util.stream.Stream;
 public class search {
 
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
+		
+		String lexiconFile = "";
+		String mapFile = "";
+		String invlistFile = "";
 		
 		Map<String, LexiconNode> lexiconMap = new Hashtable<String, LexiconNode>();
 		
 		Map<Integer, String> map = new Hashtable<Integer, String>();
 		
-		loadLexicons(lexiconMap, "lexicon.txt");
-		loadMap(map, "map.txt");
+		if (args.length < 4)
+			 throw new IllegalArgumentException("Not enough arguments provided");
+			
+		if (fileExists(args[0]))
+			lexiconFile = args[0]; //lexicons file exists
 		
-		String[] searchTerms = {"west","1.1","one"};
+		if (fileExists(args[1]))
+			invlistFile = args[1]; //inverted invlists file exists
 		
-		search(searchTerms, lexiconMap, map,"invlist.txt");
+		if (fileExists(args[2]))
+			mapFile = args[2]; //Map file exists
+			
+		
+		
+		loadLexicons(lexiconMap, lexiconFile);
+		loadMap(map, mapFile);
+		
+		String[] searchTerms = new String[args.length - 3];
+		for (int i = 3; i < args.length; i++)
+			searchTerms[i-3] = args[i];
+		
+		System.out.println("Search terms: "+searchTerms.length);
+		
+		search(searchTerms, lexiconMap, map, invlistFile);
 
 	}
 	
@@ -140,6 +162,17 @@ public class search {
 			e.printStackTrace();
 		}
 		
+	}
+	
+	public static Boolean fileExists(String filename) {
+		File file = new File(filename);
+	    Boolean exists = file.exists();
+	    if (file.exists() && file.isFile())
+	    {
+	    	return true;
+	    } else {
+	    	throw new IllegalArgumentException("File'"+filename+"' does not exist"); //May as well handle the errors here
+	    }
 	}
 
 }
