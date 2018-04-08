@@ -45,12 +45,12 @@ public class search {
 					/*Print our results for this term*/
 					
 					System.out.println(terms[i]); //term
-					System.out.println(invlistDataParts[0]); //Document Frequency
+					System.out.println(Integer.parseInt(invlistDataParts[0], 2)); //Document Frequency
 					
 					for (int j = 1; j < invlistDataParts.length; j++) {
 						if ( (j & 1) != 0 ) { //if number is Odd then thats our document Id
-							String documentId = map.get(Integer.parseInt(invlistDataParts[j]));
-							String counter = invlistDataParts[j+1];
+							String documentId = map.get(Integer.parseInt(invlistDataParts[j],2));
+							int counter = Integer.parseInt(invlistDataParts[j+1],2);
 						System.out.println(documentId+" "+counter);
 						}
 					}

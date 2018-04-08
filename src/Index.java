@@ -255,12 +255,12 @@ public class Index {
 		      for (LexiconNode lexconNode : lexicons) {
 		    	  Collection<InvertedList> lexiconCollection = lexconNode.getInvertedListValues();
 		    	  lexconNode.setPointer(pointerLocation); //Setting pointer to the file offset position as stated in the requirements
-		    	  writer.write(lexconNode.invertedList.size()+" "); //How many documents it occurs in the collection
+		    	  writer.write(Integer.toBinaryString(lexconNode.invertedList.size())+" "); //How many documents it occurs in the collection
 		    	  
 		         for (InvertedList current : lexiconCollection) {
 		        	 int documenId = current.getDocumentId();
 		        	 int counter = current.getCounter();
-		        	 writer.write(documenId+" "+counter+" ");
+		        	 writer.write(Integer.toBinaryString(documenId)+" "+Integer.toBinaryString(counter)+" ");
 		         }
 		         
 		         
