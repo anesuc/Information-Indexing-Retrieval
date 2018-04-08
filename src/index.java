@@ -57,21 +57,15 @@ public class index {
 	        
 		}
 		
-		System.out.println("sourcefile: "+sourcefile+" Stop file: "+stoplist+" Print: "+verbose);
-		
-		verbose = false;
-		
 		if(sourcefile.equals(""))
 			throw new IllegalArgumentException("Could not determine the source file from the arguments");
-		
-		//System.out.println("Stop file: ");
 		
 		
 		
 		// create Document ArrayList
 		ArrayList<Document> docList = new ArrayList<Document>();
 
-		Map<String, LexiconNode> lexicon = new TreeMap<String, LexiconNode>(); //fixme
+		Map<String, LexiconNode> lexicon = new TreeMap<String, LexiconNode>();  //lexicons list
 		
 		List<LexiconNode> allLexiconValues = new ArrayList<LexiconNode>();
 
@@ -88,36 +82,42 @@ public class index {
 			printSortedList(docList);
 		
 		try {
-			saveMap(docList, "map.txt");
+			saveMap(docList, "map");
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
 		}
 		
 		//1.3 inverted list and lexicons
-		Boolean oneWord = false;
 		for (Document doc: docList) {
-			createLexicon(doc, lexicon, oneWord); //Temp lexicon
-			oneWord = true;
+			createLexicon(doc, lexicon); //Temp lexicon
 		}
 		
 		allLexiconValues.addAll(lexicon.values());
 		
 		 try {
-			 saveInvertedLists(allLexiconValues, "invlist.txt"); //Save inverted list and also set pointers
-			 saveLexicons(allLexiconValues, "lexicon.txt");//FIXME Remove .txt before submission
+			 saveInvertedLists(allLexiconValues, "invlist"); //Save inverted list and also set pointers
+			 saveLexicons(allLexiconValues, "lexicon");
 		 }  catch (IOException e) {
-			 //FIXME handle errors here
+			 e.printStackTrace();
 		 }
 		
 	}
 	
-	//clean up the word and transfer to lowercase
+	/**  
+	    * Saves document mapping data to file
+	    * @param docList - the document list array with filters terms from the stop list etc
+	    * @param file - file name to save the mapping data to
+	    */
 	public static String cleanString(String string) {
 		return string.replaceAll("^[^a-zA-Z0-9\\s]+|[^a-zA-Z0-9\\s]+$", "").toLowerCase();
 	}
 	
-	
+	/**  
+	    * Saves document mapping data to file
+	    * @param docList - the document list array with filters terms from the stop list etc
+	    * @param file - file name to save the mapping data to
+	    */
 	public static void saveMap(ArrayList<Document> docList, String file) 
 			throws IOException {
 		
@@ -131,6 +131,11 @@ public class index {
 	}
 	
 	// print sorted list
+	
+	/**  
+	    * Prints the sorted list to console
+	    * @param docList - the document list array with filters terms from the stop list etc
+	    */
 	public static void printSortedList(ArrayList<Document> docList) {
 		
 		
@@ -150,7 +155,12 @@ public class index {
 		}
 	}
 	
-	//Parsing method
+	
+	/**  
+	    * Maps the source file into memory
+	    * @param sourcefile - Source file with data to be indexed
+	    * @param docList - the document list to store the maping information
+	    */
 	public static void mapDoc(String sourcefile, ArrayList<Document> docList) {
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(sourcefile));
@@ -238,6 +248,12 @@ public class index {
 		}
 	}
 	
+	/**  
+	    * Removes stop words from the list ( in memory)
+	    * @param stoplistFilename - File name/location that contains the stop list
+	    * @param docList - the document list with all terms currently loaded
+	    * etc
+	    */
 	public static void removeStopWords(String stoplistFilename, ArrayList<Document> docList) {
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(stoplistFilename));
@@ -266,8 +282,12 @@ public class index {
 		}
 	}
 	
-	   private static void createLexicon(Document doc,
-		         Map<String, LexiconNode> lexicon, Boolean oneWord) {   
+	/**  
+	    * Ads documents' terms into their corresponding lexicons and the term frequency information etc
+	    * @param doc - current document being processed
+	    * @param lexicon - lexicon list
+	    */
+	   private static void createLexicon(Document doc, Map<String, LexiconNode> lexicon) {   
 
 				List<String> list = new ArrayList<String>(doc.getMap().keySet());
 				Collections.sort(list);
@@ -297,6 +317,11 @@ public class index {
 				}
 		   }
 	   
+	   /**  
+	    * Saves inverted list file
+	    * @param lexicons - lexicon list
+	    * @param file - file name/location to save the lexicon
+	    */
 	   public static void saveInvertedLists(List<LexiconNode> lexicons, String file)
 			   throws IOException {
 		   
@@ -324,6 +349,11 @@ public class index {
 
 		   }
 	   
+	   /**  
+	    * Saves lexicon file
+	    * @param lexicons - lexicon list
+	    * @param file - file name/location to save the lexicon
+	    */
 	   public static void saveLexicons(List<LexiconNode> lexiconsList, String fileName)
 			   throws IOException {
 
@@ -337,9 +367,4 @@ public class index {
 		         writer.close();
 
 		   }
-	
-	public static void indexWords(ArrayList<Document> docList) {
-		//System.out.println(docList.get(0).getMap.get("a"));
-		
-	}
 }

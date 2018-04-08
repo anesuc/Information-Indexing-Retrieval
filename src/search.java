@@ -43,7 +43,6 @@ public class search {
 		for (int i = 3; i < args.length; i++)
 			searchTerms[i-3] = args[i];
 		
-		System.out.println("Search terms: "+searchTerms.length);
 		
 		search(searchTerms, lexiconMap, map, invlistFile);
 
