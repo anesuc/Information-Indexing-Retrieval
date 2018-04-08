@@ -204,7 +204,7 @@ public class Index {
 					doc.removeKey(stopWord);
 				}
 			}
-			printSortedList(docList);
+			//printSortedList(docList);
 
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -221,8 +221,6 @@ public class Index {
 				
 			
 				for (String key: list) {
-					
-					
 
 					if (!lexicon.containsKey(key)) {
 						int frequency = doc.getMap().get(key);
@@ -230,11 +228,12 @@ public class Index {
 						InvertedList docList = lexNode.invertedList.get(doc.getDocID());
 						docList	.setCounter(frequency); // We can now set the frequency directly
 						lexicon.put(key, lexNode);
-						//System.out.println("key 1: "+key+" doc.getDocID(): "+doc.getDocID());
 					} else {
 						LexiconNode lexNode = lexicon.get(key);
 						lexNode.insert(doc.getDocID());
-						//System.out.println("key 2: "+key+" doc.getDocID(): "+doc.getDocID());
+						int frequency = doc.getMap().get(key);
+						InvertedList docList = lexNode.invertedList.get(doc.getDocID());
+						docList.setCounter(frequency); // We can now set the frequency directly
 					}
 					
 					
