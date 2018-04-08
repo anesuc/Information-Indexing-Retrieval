@@ -9,7 +9,8 @@ public class LexiconNode {
 	   public LexiconNode(String term, int documentID) {
 		      this.term = term;
 		      this.invertedList = new TreeMap<Integer, InvertedList>();
-		      insert(documentID); //Insert initial documentID inverted List
+		      if ( documentID != -1)
+		    	  insert(documentID); //Insert initial documentID inverted List
 		   }
 	   
 		public String getTerm() {
