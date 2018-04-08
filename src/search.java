@@ -21,7 +21,7 @@ public class search {
 		loadLexicons(lexiconMap, "lexicon.txt");
 		loadMap(map, "map.txt");
 		
-		String[] searchTerms = {"1"};
+		String[] searchTerms = {"1","1.1","one"};
 		
 		search(searchTerms, lexiconMap, map,"invlist.txt");
 
@@ -33,33 +33,36 @@ public class search {
 		String listData;
 		String[] invlistDataParts;
 		
+		for (int i = 0; i < terms.length; i++) {
 		try (Stream<String> lines = Files.lines(Paths.get(invlistFileLocation))) {
-			
-			for (int i = 0; i < terms.length; i++) {
 				currentLexicon = lexicons.get(terms[i]);
 				
-				listData = lines.skip(currentLexicon.getPointer()).findFirst().get();
-				
-				invlistDataParts = listData.split(" ");
-				
-				/*Print our results for this term*/
-				
-				System.out.println(terms[i]); //term
-				System.out.println(invlistDataParts[0]); //Document Frequency
-				
-				for (int j = 1; j < invlistDataParts.length; j++) {
-					if ( (j & 1) != 0 ) { //if number is Odd then thats our document Id
-						String documentId = map.get(Integer.parseInt(invlistDataParts[j]));
-						String counter = invlistDataParts[j+1];
-					System.out.println(documentId+" "+counter);
+				if (currentLexicon !=  null) { //Make sure we found he search term
+					listData = lines.skip(currentLexicon.getPointer()).findFirst().get();
+					
+					invlistDataParts = listData.split(" ");
+					
+					/*Print our results for this term*/
+					
+					System.out.println(terms[i]); //term
+					System.out.println(invlistDataParts[0]); //Document Frequency
+					
+					for (int j = 1; j < invlistDataParts.length; j++) {
+						if ( (j & 1) != 0 ) { //if number is Odd then thats our document Id
+							String documentId = map.get(Integer.parseInt(invlistDataParts[j]));
+							String counter = invlistDataParts[j+1];
+						System.out.println(documentId+" "+counter);
+						}
 					}
 				}
 				
-			}
+				
+			
 		
 		}  catch (IOException e) {
 			 //FIXME handle errors here
 		 }
+		}
 		
 	}
 	
