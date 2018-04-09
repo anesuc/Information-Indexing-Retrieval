@@ -266,7 +266,6 @@ public class index {
 					doc.removeKey(stopWord);
 				}
 			}
-			//printSortedList(docList);
 
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
