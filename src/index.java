@@ -19,8 +19,8 @@ public class index {
 	
 	public static void main(String[] args) {
 		
-		String sourcefile = "";
-		String stoplist = "";
+		String sourcefile = ""; // Stores source file name/location
+		String stoplist = ""; // Stores stop list file name/location
 		Boolean verbose = false; //Print the list?
 		
 		if (args.length < 1)
@@ -39,7 +39,7 @@ public class index {
 		int stopfilePosition = -1;
 		for (int i = 0; i < args.length; i++) {
 			
-			if (args[i].equals("-s") && stoplist.equals("")) {
+			if (args[i].equals("-s") && stoplist.equals("")) { //check for stop list file
 				stoplist = args[i+1];
 				stopfilePosition = i;
 			} else if (args[i].equals("-p")) {
@@ -74,7 +74,7 @@ public class index {
 		
 		// 1.2 Stoplist
 		if(!stoplist.equals(""))
-			removeStopWords(stoplist, docList);
+			removeStopWords(stoplist, docList,verbose);
 		
 		if (verbose)
 			printSortedList(docList);
@@ -104,6 +104,8 @@ public class index {
 	
 	/**  
 	    * Replace all the string to plain lowercase word, which has no prefix and postfix punctuation and etc.
+	    * @param string - String to process
+	    * @return string - processed string
 	    */
 	public static String cleanString(String string) {
 		return string.replaceAll("^[^a-zA-Z0-9\\s]+|[^a-zA-Z0-9\\s]+$", "").toLowerCase();
@@ -131,8 +133,6 @@ public class index {
 	    * @param docList - the document list array with filters terms from the stop list etc
 	    */
 	public static void printSortedList(ArrayList<Document> docList) {
-		
-		
 		
 		for (Document doc: docList) {	
 			
@@ -246,7 +246,7 @@ public class index {
 	    * @param docList - the document list with all terms currently loaded
 	    * etc
 	    */
-	public static void removeStopWords(String stoplistFilename, ArrayList<Document> docList) {
+	public static void removeStopWords(String stoplistFilename, ArrayList<Document> docList,Boolean verbose) {
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(stoplistFilename));
 			ArrayList<String> stopList = new ArrayList<String>();
@@ -266,6 +266,7 @@ public class index {
 					doc.removeKey(stopWord);
 				}
 			}
+			//printSortedList(docList);
 
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -309,8 +310,7 @@ public class index {
 	    * @param lexicons - lexicon list
 	    * @param file - file name/location to save the lexicon
 	    */
-	public static void saveInvertedLists(List<LexiconNode> lexicons, String file)
-			   throws IOException {
+	public static void saveInvertedLists(List<LexiconNode> lexicons, String file) throws IOException {
 		   
 
 		BufferedWriter writer = new BufferedWriter(new FileWriter(file));
@@ -340,8 +340,7 @@ public class index {
 	    * @param lexicons - lexicon list
 	    * @param file - file name/location to save the lexicon
 	    */
-	public static void saveLexicons(List<LexiconNode> lexiconsList, String fileName)
-			   throws IOException {
+	public static void saveLexicons(List<LexiconNode> lexiconsList, String fileName) throws IOException {
 
 		BufferedWriter writer = new BufferedWriter(new FileWriter(fileName));
 		      
