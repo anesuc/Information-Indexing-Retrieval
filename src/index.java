@@ -41,7 +41,7 @@ public class index {
 			
 			if (args[i].equals("-s") && stoplist.equals("")) { //check for stop list file
 				stoplist = args[i+1];
-				stopfilePosition = i;
+				stopfilePosition = i+1;
 			} else if (args[i].equals("-p")) {
 				verbose = true;
 			} else if (i != stopfilePosition && sourcefile.equals("")) {
@@ -59,7 +59,6 @@ public class index {
 		
 		if(sourcefile.equals(""))
 			throw new IllegalArgumentException("Could not determine the source file from the arguments");
-		
 		
 		// create Document ArrayList, Map lexicon and List allLexiconValues
 		ArrayList<Document> docList = new ArrayList<Document>();
