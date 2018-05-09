@@ -294,7 +294,7 @@ public class search {
 				double K = K1 * ( (1 - B) + (B * LD)/AL);
 				double weight = (N - Ft + 0.5) / (Ft + 0.5);
 				double score = (java.lang.Math.log(weight)) *( (K1 + 1) * Fdt / (K + Fdt) );
-				score = Math.round (score * 10000d) /10000d; 
+				
 				occurDocument.setScore(score);
 			}
 		}
@@ -409,15 +409,18 @@ public class search {
 	 */
 	public static void printResult(String queryLabel, int numResult, ArrayList<Document> sortedDocument) {
 		
+		DecimalFormat df = new DecimalFormat("#.0000");
+		
 		if (sortedDocument.size() > 0){
 			// check the scored document number is enough for the required number or not
 			if (sortedDocument.size() >= (numResult - 1)){
 				for (int i = 0; i <= numResult-1; i++)
-					System.out.println(queryLabel + " " + sortedDocument.get(i).getDocNum() + " " + (i + 1) + " " + sortedDocument.get(i).getScore());
+					System.out.println(queryLabel + " " + sortedDocument.get(i).getDocNum() + " " + (i + 1) + " " + df.format(sortedDocument.get(i).getScore()));
 			}
+				
 			else {
 				for (int i = 0; i <= sortedDocument.size() -1; i++)
-					System.out.println(queryLabel + " " + sortedDocument.get(i).getDocNum() + " " + (i + 1) + " " + sortedDocument.get(i).getScore());
+					System.out.println(queryLabel + " " + sortedDocument.get(i).getDocNum() + " " + (i + 1) + " " + df.format(sortedDocument.get(i).getScore()));
 			}
 		}
 		else {
