@@ -121,7 +121,7 @@ public class index {
 		BufferedWriter writer = new BufferedWriter(new FileWriter(file));
 		
 		for (Document doc: docList) {
-			writer.write(doc.getDocID() + " " + doc.getDocNum());
+			writer.write(doc.getDocID() + " " + doc.getDocNum() + " " + doc.getLength());
 			writer.newLine();
 		}
 		writer.close();
@@ -317,12 +317,12 @@ public class index {
 			for (LexiconNode lexconNode : lexicons) {
 				Collection<InvertedList> lexiconCollection = lexconNode.getInvertedListValues();
 		    	lexconNode.setPointer(pointerLocation); //Setting pointer to the file offset position as stated in the requirements
-		    	writer.write(Integer.toBinaryString(lexconNode.invertedList.size())+" "); //How many documents it occurs in the collection
+		    	writer.write(lexconNode.invertedList.size()+" "); //How many documents it occurs in the collection
 		    	  
 		    for (InvertedList current : lexiconCollection) {
 		    	int documenId = current.getDocumentId();
 		        int counter = current.getCounter();
-		        writer.write(Integer.toBinaryString(documenId)+" "+Integer.toBinaryString(counter)+" ");
+		        writer.write(documenId+" "+counter+" ");
 		    }
 		         
 		         

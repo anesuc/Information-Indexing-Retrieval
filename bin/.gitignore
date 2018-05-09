@@ -1,5 +1,10 @@
-/invlist.txt
+/Document.class
+/InvertedList.class
+/LexiconNode.class
+/index.class
+/search.class
 /latimes-100
-/lexicon.txt
-/map.txt
+/lexicon
+/map
+/invlist
 /stoplist
