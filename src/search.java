@@ -111,7 +111,7 @@ public class search {
 		
 		bm25(searchTerms, documents, replace);
 		
-		heapifyList(replace, sortedDocument);
+		heapifyList(numResult, replace, sortedDocument);
 		
 		printResult(queryLabel, numResult, sortedDocument);
 		
@@ -349,18 +349,57 @@ public class search {
 	
 	/**
 	 * 
+	 * @param numResult - the number of results for printing
 	 * @param replace - store the documents which have valid score
 	 * @param sortedDocument - store the sorted documents after heapify
 	 */
-	public static void heapifyList(ArrayList<Document> replace, ArrayList<Document> sortedDocument) {
+	public static void heapifyList(int numResult, ArrayList<Document> replace, ArrayList<Document> sortedDocument) {
 		
-		for (int i = replace.size() ; i >= 1 ; i--) {
-			for (int j = (int) Math.floor(i / 2); j >= 1; j--){
-			heapify(replace, j);
+		ArrayList<Document> heapify = new ArrayList<Document>();// a new list used for heapify only
+		
+		//put needed number of documents to list
+		//for example, if it need to print 100 results, firstly we put first 100 documents in this arraylist and heapify.
+		if (numResult < replace.size()){ //checking the size
+		for (int i = 0; i < numResult; i++){
+			heapify.add(replace.get(i));
+		}
+		}else{
+			for (int i = 0; i < replace.size(); i++){
+				heapify.add(replace.get(i));
 			}
-			sortedDocument.add(replace.get(0));// put smallest value into sortedDocument
-			replace.set(0, replace.get(replace.size()-1));// set the last position child value to the first place
-			replace.remove(replace.size()-1); //remove the last position child
+		}
+		//heapify before next step
+		for (int j = (int) Math.floor(numResult/2); j >=1; j--){
+		heapify(heapify, numResult);
+		}
+
+		//secondly, compare all other documents score to the first elements in the list, which always has the smallest value.
+		for (int i = numResult ; i <replace.size() ; i++){
+			
+			int retval = Double.compare(replace.get(i).getScore(), heapify.get(0).getScore());//comparing two double values
+			
+			//if retval greater than 0, which means this document score is greater than the first elements in the list.
+			//replace the first elements with this score, then heapify the list for the new smallest element(in position 0).
+			if (retval > 0){
+				heapify.set(0, replace.get(i));
+				for (int j = (int) Math.floor(numResult / 2); j >= 1; j--){
+					heapify(heapify, j);
+					}
+			
+			//if retval is not greater than 0, the for loop continue for next larger value
+			}else{
+				continue;
+			}
+		}
+
+		//in the end, put all value to sortedDocument list from small to large, then reverse
+		for (int i = heapify.size(); i >= 1; i--){
+			for (int j = (int) Math.floor(i / 2); j >= 1; j--){
+				heapify(heapify, j);
+				}
+			sortedDocument.add(heapify.get(0));// put smallest value into sortedDocument
+			heapify.set(0, heapify.get(heapify.size()-1));// set the last position child value to the first place
+			heapify.remove(heapify.size()-1);//remove the last position child
 		}
 		
 		Collections.reverse(sortedDocument);// reverse the list and make it listed from large to small
