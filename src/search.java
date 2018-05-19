@@ -113,6 +113,8 @@ public class search {
 		
 		heapifyList(numResult, replace, sortedDocument);
 		
+		addDocumentSummary(searchTerms, sortedDocument,"latimes-100", 1);
+		
 		printResult(queryLabel, numResult, sortedDocument);
 		
 		long endTime = System.nanoTime();
@@ -206,6 +208,7 @@ public class search {
 		String docNumber; //Lexicon term
 		int docId; //Lexicon pointer to the inverted list
 		int docLength; //Document length
+		int docPositionLocation; //stores location within a string that has document position information
 		
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(fileLocation));
@@ -223,8 +226,9 @@ public class search {
 				docId = Integer.parseInt(parts[0]);//set document ID
 				docNumber = parts[1]; // set document name
 				docLength = Integer.parseInt(parts[2]); // set document length
+				docPositionLocation = Integer.parseInt(parts[3]); // set document length
 				
-				Document document = new Document(docNumber, docId, docLength);
+				Document document = new Document(docNumber, docId, docLength, docPositionLocation);
 				documents.add(document); 
 			}
 				
@@ -440,6 +444,272 @@ public class search {
 		}
 	}
 	
+
+	
+	
+	public static void addDocumentSummary(String[] searchTerms, ArrayList<Document> sortedDocument,String sourcefile, int summaryType) {
+		// Making variables mutable so that I can read them inside the forEach
+		String[] summaryText = new String[1];
+		String finalSummaryText = "";
+		Boolean[] processThisDocument = new Boolean[1];
+		Integer[] linesProcessed = new Integer[1];
+		Integer[] documentPosition = new Integer[1];
+		String[] documentNo = new String[1];
+		
+		//Boolean[] neverProcess = new Boolean[1];
+		//String documentNo;
+		//SortedMap<Integer, String> termLocations;
+		List<Integer>  termLocations = new ArrayList<Integer>();
+		//String line;
+		//String term = searchTerms;
+		
+		if (summaryType == 1) { // Just get first few words
+			
+		}
+		
+		Integer[] setSummaryType =  {summaryType};
+		//setSummaryType[0] = summaryType;
+		
+		if (sortedDocument.size() > 0){
+				for (int i = 0; i <= sortedDocument.size() -1; i++) {
+					summaryText[0] = "";
+					processThisDocument[0] = false;
+					linesProcessed[0] = 0;
+					documentPosition[0] = sortedDocument.get(i).getDocumentPosition();
+					documentNo[0] = sortedDocument.get(i).getDocNum();
+					termLocations.clear();
+					//System.out.println("documentPosition: "+documentPosition[0]);
+					
+					try (Stream<String> lines = Files.lines(Paths.get(sourcefile))) {
+							boolean[] openHeadlineTag = {false};
+							boolean[] openPTag = {false};
+							boolean[] openTextTag = {false};
+							Integer[] currentLine = {documentPosition[0]};
+							
+							boolean[] doNotProcess = {false};
+							
+						lines.skip(documentPosition[0]).forEach((line) -> {
+						
+						String openHeadline = "<HEADLINE>";
+						String closeHeadline = "</HEADLINE>";
+						
+						
+						String openP = "<P>";
+						String closeP = "</P>";
+						
+						
+						String openText = "<TEXT>";
+						String closeText = "</TEXT>";
+						
+						String closeDoc = "</DOC>";
+						
+						/*if (currentLine[0] == documentPosition[0])
+							System.out.println("First ever line: "+line);*/
+						
+						//while (true) {
+							//String line = br.readLine();
+							
+							if (line == null) {
+								//doNotProcess[0] = true;
+								//return; //throw new Exception();
+							}
+							
+							if (line.equals(closeDoc) && processThisDocument[0]) {
+								doNotProcess[0] = true;
+								//System.out.println("Close: "+line);
+								//return;//throw new Exception();
+							}
+							
+							// add Document to ArrayList
+							Pattern pattern = Pattern.compile("<DOCNO>(.*?)</DOCNO>");
+							Matcher m = pattern.matcher(line);
+							if(m.find()){
+								if (m.group(1).replaceAll(" ", "").equals(documentNo[0]))
+									processThisDocument[0] = true;
+							}
+							
+							// check head tag
+							if (line.equals(closeHeadline)) {
+								openHeadlineTag[0] = false;
+							}
+							
+							if (openHeadlineTag[0]) {
+								if (!line.equals(openP) && !line.equals(closeP)) {
+									
+								
+								}
+							}
+							
+							if (line.equals(openHeadline)) {
+								openHeadlineTag[0] = true;
+							}
+							
+							// check text tag
+							if (line.equals(closeText)) {
+								openTextTag[0] = false;
+							}
+							
+							if (openTextTag[0]) {
+								if (!line.equals(openP) && !line.equals(closeP)) {
+									if (setSummaryType[0] == 1 && !doNotProcess[0]) {
+									if (processThisDocument[0]) {
+										if (linesProcessed[0] < 5) {
+											summaryText[0] += line+"\n";
+											linesProcessed[0]++;
+										} else {
+											doNotProcess[0] = true;//break; //We already got the lines we need
+										}
+										
+									}
+									} else {
+										if (!doNotProcess[0]) {
+											//System.out.println("Gets here: "+line);
+										for (int j = 0; j < searchTerms.length; j++) {
+											int wordLocation = summaryText[0].toLowerCase().indexOf(searchTerms[j]);
+											
+											if (wordLocation != -1)
+												termLocations.add(linesProcessed[0]-1);
+											
+										}
+										summaryText[0] += line+"\n";
+										linesProcessed[0]++;
+										}
+									}
+									
+								}
+							}
+							if (line.equals(openText)) {
+								openTextTag[0] = true;
+							}
+							
+							currentLine[0]++;
+							
+							//line = lines.skip(currentLine).findFirst().get();
+							
+						//}
+						});
+					
+
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+					
+					if (setSummaryType[0] == 1) {
+						
+						for (int m = 0; m < searchTerms.length; m++) {
+							String term = searchTerms[m];
+							int wordLocation = summaryText[0].toLowerCase().indexOf(term);
+							//System.out.println("Index of term: "+wordLocation);
+							while (wordLocation >= 0) {
+								StringBuilder input = new StringBuilder(summaryText[0]);
+								input.insert(wordLocation+term.length(), "\033[0;0m"); // Start with the end of the word;
+								input.insert(wordLocation, "\033[0;1m"); // End with with start of the word
+								//input.insert(wordLocation+term.length(), "hi");
+								summaryText[0] = input.toString();
+								int jumpTo = wordLocation+("\033[0;0m"+term+"\033[0;0m").length(); // Take into account the new chars
+								wordLocation = summaryText[0].toLowerCase().indexOf(term, jumpTo+1);
+							}
+						}
+						
+						/*String term = searchTerms[0];
+					int wordLocation = summaryText[0].toLowerCase().indexOf(term);
+					//System.out.println("Index of term: "+summaryText[0].length());
+					if (wordLocation != -1) {
+						StringBuilder input = new StringBuilder(summaryText[0]);
+						input.insert(wordLocation+term.length(), "\033[0;0m"); // Start with the end of the word;
+						input.insert(wordLocation, "\033[0;1m"); // End with with start of the word
+						//input.insert(wordLocation+term.length(), "hi");
+						summaryText[0] = input.toString();
+					}*/
+					
+					sortedDocument.get(i).addSummary(summaryText[0]);
+					} else {
+						
+						
+						Collections.sort(termLocations);
+						
+						int startingLine = 0;
+						
+						if (termLocations.size() > 0)
+							startingLine = termLocations.get(0);
+						else {
+							System.out.println("Could not find word in document: "+documentNo[0]);
+						}
+						
+						//System.out.println("startingLine a: "+startingLine);
+						
+						for (int k = 0; k < termLocations.size(); k++) {
+							
+							if ((k+1) < termLocations.size())
+								if ((termLocations.get(k+1) - termLocations.get(k)) < 5) {
+									startingLine = termLocations.get(k);
+									break;
+									
+								}
+						}
+						
+						
+					
+						
+						String[] allLines = summaryText[0].split("(?<=\r\n|\r|\n)"); // Split and Keep the delimiters for paragraphs
+						
+						summaryText[0] = "";
+						
+						//System.out.println("allLines 0: "+allLines[0]);
+						
+						//System.out.println("lines processed: "+linesProcessed[0]);
+						//System.out.println("lines length: "+allLines.length);
+						//System.out.println("lines 0: "+allLines.length);
+						
+						for (int k = startingLine; k < allLines.length; k++) {
+							summaryText[0] += allLines[k];
+							//System.out.println("allLines[k]: "+allLines[k]);
+							if ((k - startingLine) == 5)
+								break; //line limit for summary
+						}
+						
+						//System.out.println("summaryText 0: "+summaryText[0]);
+						
+						
+						for (int m = 0; m < searchTerms.length; m++) {
+							String term = searchTerms[m];
+							int wordLocation = summaryText[0].toLowerCase().indexOf(term);
+							//System.out.println("Index of term: "+wordLocation);
+							while (wordLocation >= 0) {
+								StringBuilder input = new StringBuilder(summaryText[0]);
+								input.insert(wordLocation+term.length(), "\033[0;0m"); // Start with the end of the word;
+								input.insert(wordLocation, "\033[0;1m"); // End with with start of the word
+								//input.insert(wordLocation+term.length(), "hi");
+								summaryText[0] = input.toString();
+								int jumpTo = wordLocation+("\033[0;0m"+term+"\033[0;0m").length(); // Take into account the new chars
+								wordLocation = summaryText[0].toLowerCase().indexOf(term, jumpTo+1);
+							}
+						}
+						
+							
+						
+						sortedDocument.get(i).addSummary("..."+summaryText[0]);
+						
+						
+						//System.out.println("startingLine: "+startingLine);
+						/*for (int j = 0; j <= sortedDocument.size() -1; j++) {
+							termLocations
+						}*/
+					}
+					
+					
+				}
+					//System.out.println(queryLabel + " " + sortedDocument.get(i).getDocNum() + " " + (i + 1) + " " + df.format(sortedDocument.get(i).getScore()));
+			
+		}
+		
+
+		
+		
+	}
+	
+	
+	
 	/**
 	 * 
 	 * @param queryLabel - the label of the query terms
@@ -453,13 +723,17 @@ public class search {
 		if (sortedDocument.size() > 0){
 			// check the scored document number is enough for the required number or not
 			if (sortedDocument.size() >= (numResult - 1)){
-				for (int i = 0; i <= numResult-1; i++)
+				for (int i = 0; i <= numResult-1; i++) {
 					System.out.println(queryLabel + " " + sortedDocument.get(i).getDocNum() + " " + (i + 1) + " " + df.format(sortedDocument.get(i).getScore()));
+					System.out.println(sortedDocument.get(i).getSummary());
+				}
 			}
 				
 			else {
-				for (int i = 0; i <= sortedDocument.size() -1; i++)
+				for (int i = 0; i <= sortedDocument.size() -1; i++) {
 					System.out.println(queryLabel + " " + sortedDocument.get(i).getDocNum() + " " + (i + 1) + " " + df.format(sortedDocument.get(i).getScore()));
+					System.out.println(sortedDocument.get(i).getSummary());
+				}	
 			}
 		}
 		else {

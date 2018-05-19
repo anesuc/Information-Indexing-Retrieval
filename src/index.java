@@ -121,7 +121,7 @@ public class index {
 		BufferedWriter writer = new BufferedWriter(new FileWriter(file));
 		
 		for (Document doc: docList) {
-			writer.write(doc.getDocID() + " " + doc.getDocNum() + " " + doc.getLength());
+			writer.write(doc.getDocID() + " " + doc.getDocNum() + " " + doc.getLength() + " " + doc.getDocumentPosition());
 			writer.newLine();
 		}
 		writer.close();
@@ -171,6 +171,8 @@ public class index {
 			String openText = "<TEXT>";
 			String closeText = "</TEXT>";
 			
+			int currentLine = 0;
+			
 			while (true) {
 				String line = br.readLine();
 				
@@ -182,7 +184,7 @@ public class index {
 				Pattern pattern = Pattern.compile("<DOCNO>(.*?)</DOCNO>");
 				Matcher m = pattern.matcher(line);
 				if(m.find()){
-					Document currentDoc = new Document(m.group(1).replaceAll(" ", ""), docList.size());
+					Document currentDoc = new Document(m.group(1).replaceAll(" ", ""), docList.size(), currentLine);
 					docList.add(currentDoc);
 				}
 				
@@ -230,6 +232,8 @@ public class index {
 				if (line.equals(openText)) {
 					openTextTag = true;
 				}
+				
+				currentLine++;
 			}
 
 		} catch (FileNotFoundException e) {

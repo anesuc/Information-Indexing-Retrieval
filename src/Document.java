@@ -8,21 +8,33 @@ public class Document{
 	private int length;
 	private HashMap<String, Integer> termFrequency;
 	private double score;
+	private int docPosition;
+	private String documentSummary;
 	
-	public Document (String docNum, int docID) {
+	public Document (String docNum, int docID, int position) {
 		this.docNum = docNum;
 		this.dict = new HashMap<String, Integer>();
 		this.docID = docID;
 		this.length = 0;
+		this.docPosition = position;
 	}
 	
-	public Document (String docNum, int docID, int length) {
+	public Document (String docNum, int docID, int length, int position) {
 		this.docNum = docNum;
 		this.docID = docID;
 		this.length = length;
 		this.termFrequency = new HashMap<String, Integer>();
 		this.score = 0;
 		this.dict = new HashMap<String, Integer>();
+		this.docPosition = position;
+	}
+	
+	public void addSummary(String summary) {
+		documentSummary = summary;
+	}
+	
+	public String getSummary() {
+		return documentSummary;
 	}
 	
 	public String getDocNum () {
@@ -31,6 +43,10 @@ public class Document{
 	
 	public int getDocID () {
 		return docID;
+	}
+	
+	public int getDocumentPosition() {
+		return this.docPosition; //returns document position in file
 	}
 	
 	/**  
