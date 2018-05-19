@@ -113,7 +113,7 @@ public class search {
 		
 		heapifyList(numResult, replace, sortedDocument);
 		
-		addDocumentSummary(searchTerms, sortedDocument,"latimes-100", 1);
+		addDocumentSummary(searchTerms, sortedDocument,"latimes-100", 2);
 		
 		printResult(queryLabel, numResult, sortedDocument);
 		
@@ -149,7 +149,8 @@ public class search {
 					for (int j = 1; j < invlistDataParts.length; j++) {
 						if ( (j & 1) != 0 ) { //if number is Odd then thats our document Id
 							int counter = Integer.parseInt(invlistDataParts[j+1]);
-							documents.get(j).setTermFreq(terms[i], counter);
+							documents.get(Integer.parseInt(invlistDataParts[j])).setTermFreq(terms[i], counter);
+								
 						}
 					}
 				}
