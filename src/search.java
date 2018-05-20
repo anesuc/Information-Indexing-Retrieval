@@ -19,13 +19,15 @@ public class search {
 		long startTime = System.nanoTime();
 		
 		// Variable
-		String queryLabel = "";
+		int queryLabel = 0;
 		int numResult = 0;
 		String lexiconFile = "";
 		String mapFile = "";
 		String invlistFile = "";
 		String stopList = "";
 		String stoplistFilename = "";
+		String latimesDocumentFile = "";
+		int summaryType = 0;
 		
 		// Map & ArrayList 
 		String[] searchTerms = null;
@@ -45,11 +47,11 @@ public class search {
 		// Argument
 		if (args[0].equals("-BM25")) {
 			
-			if (args.length < 12)
+			if (args.length < 16)
 				throw new IllegalArgumentException("Not enough arguments provided");
 			
 			if (args[1].equals("-q"))
-				queryLabel = args[2];// set queryLabel
+				queryLabel = Integer.parseInt(args[2]);// set queryLabel
 			
 			if (args[3].equals("-n"))
 				numResult = Integer.parseInt(args[4]); // set number of result
@@ -63,20 +65,28 @@ public class search {
 			if (args[9].equals("-m") && fileExists(args[10]))
 				mapFile = args[10]; //Map file exists
 				
-			if (args[11].equals("-s")){
-				if (fileExists(args[12]))
-					stoplistFilename = args[12];
+			if (args[11].equals("-d") && fileExists(args[12]))
+				latimesDocumentFile = args[12]; //Latimes file exists
+			
+			if (args[13].equals("-t"))
+				summaryType = Integer.parseInt(args[14]);//Type of summary
 				
-				searchTerms = new String[args.length - 13];
+			//check if stoplist apply
+			if (args[15].equals("-s")){
 				
-				for (int i = 13; i < args.length; i++)
-					searchTerms[i-13] = args[i].toLowerCase();
+				if (fileExists(args[16]))
+					stoplistFilename = args[16];
+				
+				searchTerms = new String[args.length - 17];
+				
+				for (int i = 17; i < args.length; i++)
+					searchTerms[i-17] = args[i].toLowerCase();
 				
 			}else {
-				searchTerms = new String[args.length - 11];
+				searchTerms = new String[args.length - 15];
 				
-				for (int i = 11; i < args.length; i++)
-					searchTerms[i-11] = args[i].toLowerCase();
+				for (int i = 15; i < args.length; i++)
+					searchTerms[i-15] = args[i].toLowerCase();
 			}
 			
 		}
@@ -104,20 +114,20 @@ public class search {
 
 		loadMap(documents, mapFile);
 		
-		if(args[11].equals("-s"))
-			removeStopWords(stoplistFilename, documents);
-
 		search(searchTerms, lexiconMap, documents, invlistFile);
+		
+		if(args[15].equals("-s"))
+			removeStopWords(stoplistFilename, documents);
 		
 		bm25(searchTerms, documents, replace);
 		
 		heapifyList(numResult, replace, sortedDocument);
 		
-		if(args[11].equals("-s")) {
+		if(args[15].equals("-s")) {
 			String[] noStopWordsSearchTerms = removeStopWordsFromSearchTerms(stoplistFilename, searchTerms);
-			addDocumentSummary(noStopWordsSearchTerms, sortedDocument,"latimes-100", 2);
+			addDocumentSummary(noStopWordsSearchTerms, sortedDocument,latimesDocumentFile, summaryType);
 		} else {
-			addDocumentSummary(searchTerms, sortedDocument,"latimes-100", 2);
+			addDocumentSummary(searchTerms, sortedDocument,latimesDocumentFile, summaryType);
 		}
 		
 		printResult(queryLabel, numResult, sortedDocument);
@@ -439,7 +449,7 @@ public class search {
 			// compare index and stoplist, delete same word
 			for (Document doc: documents){
 				for (String stopWord : stopList){
-					doc.removeKey(stopWord);
+					doc.removeTermFreq(stopWord);
 				}
 			}
 
@@ -790,7 +800,7 @@ public class search {
 	 * @param numResult - the number of results for printing
 	 * @param sortedDocument - store the sorted documents after heapify
 	 */
-	public static void printResult(String queryLabel, int numResult, ArrayList<Document> sortedDocument) {
+	public static void printResult(int queryLabel, int numResult, ArrayList<Document> sortedDocument) {
 		
 		DecimalFormat df = new DecimalFormat("#.0000");
 		

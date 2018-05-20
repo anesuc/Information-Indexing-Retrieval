@@ -94,6 +94,17 @@ public class Document{
 	
 	/**
 	 * 
+	 * @param key - stopword
+	 */
+	public void removeTermFreq(String key){
+		if (termFrequency.get(key) != null) {
+			this.length -= key.length() * termFrequency.get(key);
+		}
+		termFrequency.remove(key);
+	}
+	
+	/**
+	 * 
 	 * @param term - indexed word
 	 * @return 
 	 */
