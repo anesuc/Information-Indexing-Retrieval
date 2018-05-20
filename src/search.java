@@ -740,12 +740,15 @@ public class search {
 						/* Check if the location we are starting the summary is near the end of the document.
 						 * If so, then we want to go back 4 sentences so that the summary has a bit of context.
 						 */
+						//System.out.println(" allLines: "+ allLines.length);
+						//System.out.println(" goBackTo: "+ goBackTo);
+						int goBackTo = allLines.length - 4;
+						int startingLineUpperPosition = startingLine-4;
 						
-						if (startingLine > (allLines.length - 4)) {
-							for (int k = (startingLine-4); k < allLines.length; k++) {
-									
+						if (startingLine > goBackTo && goBackTo > 0) {
+							for (int k = goBackTo; k < allLines.length; k++) {
 								summaryText[0] += allLines[k];
-								if ((k - (startingLine-4)) == 5)
+								if ((k - startingLineUpperPosition) == 5)
 									break; //line limit for summary
 							}
 						} else {
