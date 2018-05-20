@@ -113,7 +113,9 @@ public class search {
 		
 		heapifyList(numResult, replace, sortedDocument);
 		
-		addDocumentSummary(searchTerms, sortedDocument,"latimes-100", 2);
+		String[] noStopWordsSearchTerms = removeStopWordsFromSearchTerms(stoplistFilename, searchTerms);
+		
+		addDocumentSummary(noStopWordsSearchTerms, sortedDocument,"latimes-100", 2);
 		
 		printResult(queryLabel, numResult, sortedDocument);
 		
@@ -445,6 +447,54 @@ public class search {
 		}
 	}
 	
+	
+	/**  
+	    * Removes stop words from the search terms ( in memory)
+	    * @param stoplistFilename - File name/location that contains the stop list
+	    * @param searchTerms - A simple array of search terms from the user
+	    * @return searchTerms - a simple array of search terms without stop words
+	    */
+	public static String[] removeStopWordsFromSearchTerms(String stoplistFilename, String[] searchTerms) {
+		try {
+			BufferedReader br = new BufferedReader(new FileReader(stoplistFilename));
+			ArrayList<String> stopList = new ArrayList<String>();
+			
+			while(true) {
+				String line = br.readLine();
+				
+				if (line == null){
+					break;
+				}
+				stopList.add(line);
+			}
+			
+			List<String> tempSearchTerms = new ArrayList<String>();;
+			
+			// compare search term and stoplist, don't add same word
+			for (int i = 0; i < searchTerms.length; i++){
+				Boolean found = false;
+				for (String stopWord : stopList){
+					if(stopWord.equals(searchTerms[i]))
+						found = true;
+				}
+				if (!found)
+					tempSearchTerms.add(searchTerms[i]);
+			}
+			
+			String[] finalSearchTerms = new String[ tempSearchTerms.size() ];
+			tempSearchTerms.toArray( finalSearchTerms );
+			
+			return finalSearchTerms;
+
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return searchTerms;
+	}
+	
 
 	
 	
@@ -566,10 +616,16 @@ public class search {
 										if (!doNotProcess[0]) {
 											//System.out.println("Gets here: "+line);
 										for (int j = 0; j < searchTerms.length; j++) {
-											int wordLocation = summaryText[0].toLowerCase().indexOf(searchTerms[j]);
+											int wordLocation = line.toLowerCase().indexOf(searchTerms[j]);
+											
+											// Also check the rest of the sentence incase it occurs more than once in the sentence
+											/*while (wordLocation >= 0) {
+												termLocations.add(linesProcessed[0]-1);
+												wordLocation = summaryText[0].toLowerCase().indexOf(searchTerms[j], wordLocation+1);
+											}*/
 											
 											if (wordLocation != -1)
-												termLocations.add(linesProcessed[0]-1);
+												termLocations.add(linesProcessed[0]);
 											
 										}
 										summaryText[0] += line+"\n";
@@ -637,15 +693,21 @@ public class search {
 							System.out.println("Could not find word in document: "+documentNo[0]);
 						}
 						
-						//System.out.println("startingLine a: "+startingLine);
 						
 						for (int k = 0; k < termLocations.size(); k++) {
 							
+							/* Checking the difference of 4 because we want a max of 5 sentences. And as seen
+							 * later in the code we usually start from the line before the first occurance of a term
+							 * so that we give the user enough space for context.
+							 */
 							if ((k+1) < termLocations.size())
-								if ((termLocations.get(k+1) - termLocations.get(k)) < 5) {
+								if ((termLocations.get(k+1) - termLocations.get(k)) < 4) {
 									startingLine = termLocations.get(k);
 									break;
-									
+									/* Breaking as early as possible because we want the earliest match.
+									 * For example if 2 of the search terms appear in the first 2 lines of the
+									 * document, then it's better to show those than later on in the document
+									 */
 								}
 						}
 						
@@ -662,12 +724,29 @@ public class search {
 						//System.out.println("lines length: "+allLines.length);
 						//System.out.println("lines 0: "+allLines.length);
 						
-						for (int k = startingLine; k < allLines.length; k++) {
-							summaryText[0] += allLines[k];
-							//System.out.println("allLines[k]: "+allLines[k]);
-							if ((k - startingLine) == 5)
-								break; //line limit for summary
+						/* Check if the location we are starting the summary is near the end of the document.
+						 * If so, then we want to go back 4 sentences so that the summary has a bit of context.
+						 */
+						
+						if (startingLine > (allLines.length - 4)) {
+							for (int k = (startingLine-4); k < allLines.length; k++) {
+									
+								summaryText[0] += allLines[k];
+								if ((k - (startingLine-4)) == 5)
+									break; //line limit for summary
+							}
+						} else {
+							for (int k = startingLine; k < allLines.length; k++) {
+								
+								if (k == startingLine && (k-1)>=0)
+									summaryText[0] += allLines[k-1]; // First line, add a bit of context before it
+								
+								summaryText[0] += allLines[k];
+								if ((k - startingLine) == 4)
+									break; //line limit for summary
+							}
 						}
+						
 						
 						//System.out.println("summaryText 0: "+summaryText[0]);
 						
@@ -675,12 +754,10 @@ public class search {
 						for (int m = 0; m < searchTerms.length; m++) {
 							String term = searchTerms[m];
 							int wordLocation = summaryText[0].toLowerCase().indexOf(term);
-							//System.out.println("Index of term: "+wordLocation);
 							while (wordLocation >= 0) {
 								StringBuilder input = new StringBuilder(summaryText[0]);
 								input.insert(wordLocation+term.length(), "\033[0;0m"); // Start with the end of the word;
 								input.insert(wordLocation, "\033[0;1m"); // End with with start of the word
-								//input.insert(wordLocation+term.length(), "hi");
 								summaryText[0] = input.toString();
 								int jumpTo = wordLocation+("\033[0;0m"+term+"\033[0;0m").length(); // Take into account the new chars
 								wordLocation = summaryText[0].toLowerCase().indexOf(term, jumpTo+1);
@@ -690,17 +767,10 @@ public class search {
 							
 						
 						sortedDocument.get(i).addSummary("..."+summaryText[0]);
-						
-						
-						//System.out.println("startingLine: "+startingLine);
-						/*for (int j = 0; j <= sortedDocument.size() -1; j++) {
-							termLocations
-						}*/
 					}
 					
 					
 				}
-					//System.out.println(queryLabel + " " + sortedDocument.get(i).getDocNum() + " " + (i + 1) + " " + df.format(sortedDocument.get(i).getScore()));
 			
 		}
 		
