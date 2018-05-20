@@ -105,7 +105,7 @@ public class search {
 		loadMap(documents, mapFile);
 		
 		if(args[11].equals("-s"))
-		removeStopWords(stoplistFilename, documents);
+			removeStopWords(stoplistFilename, documents);
 
 		search(searchTerms, lexiconMap, documents, invlistFile);
 		
@@ -113,9 +113,12 @@ public class search {
 		
 		heapifyList(numResult, replace, sortedDocument);
 		
-		String[] noStopWordsSearchTerms = removeStopWordsFromSearchTerms(stoplistFilename, searchTerms);
-		
-		addDocumentSummary(noStopWordsSearchTerms, sortedDocument,"latimes-100", 2);
+		if(args[11].equals("-s")) {
+			String[] noStopWordsSearchTerms = removeStopWordsFromSearchTerms(stoplistFilename, searchTerms);
+			addDocumentSummary(noStopWordsSearchTerms, sortedDocument,"latimes-100", 2);
+		} else {
+			addDocumentSummary(searchTerms, sortedDocument,"latimes-100", 2);
+		}
 		
 		printResult(queryLabel, numResult, sortedDocument);
 		
