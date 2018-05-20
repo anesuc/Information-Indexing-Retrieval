@@ -509,30 +509,27 @@ public class search {
 	}
 	
 
-	
+	/**  
+	    * Add document summaries to each document
+	    * @param searchTerms - search terms to look for and highlight in the summary
+	    * @param sortedDocument - documents to add summaries to
+	    * @param sortedDocument- source file to get the summaries from
+	    * @param summaryType- Summary type 1 = not query based (first 5 sentences) and 2 = search query based, finds closest radius occurrence of words
+	    */
 	
 	public static void addDocumentSummary(String[] searchTerms, ArrayList<Document> sortedDocument,String sourcefile, int summaryType) {
-		// Making variables mutable so that I can read them inside the forEach
-		String[] summaryText = new String[1];
-		String finalSummaryText = "";
-		Boolean[] processThisDocument = new Boolean[1];
-		Integer[] linesProcessed = new Integer[1];
-		Integer[] documentPosition = new Integer[1];
-		String[] documentNo = new String[1];
+		/* Making variables mutable so that I can read them inside the forEach
+		 * You will notice a good use of 1 length arrays. I am using the fact that they are mutable to be able
+		 * to access them in the forEach loop. Yes, I could have also created a class based object, thats another way.
+		 */
+		String[] summaryText = new String[1]; //Store summary of the current document being processed in here
+		Boolean[] processThisDocument = new Boolean[1]; // Store status of whether to keep processsong the document. Saves resources
+		Integer[] linesProcessed = new Integer[1]; // Store number of lines already processed
+		Integer[] documentPosition = new Integer[1]; // Store the position of the document we are processing (line position)
+		String[] documentNo = new String[1]; // Store number of document we are processing
+		List<Integer>  termLocations = new ArrayList<Integer>(); // Store line positions where the query terms occur within the document
 		
-		//Boolean[] neverProcess = new Boolean[1];
-		//String documentNo;
-		//SortedMap<Integer, String> termLocations;
-		List<Integer>  termLocations = new ArrayList<Integer>();
-		//String line;
-		//String term = searchTerms;
-		
-		if (summaryType == 1) { // Just get first few words
-			
-		}
-		
-		Integer[] setSummaryType =  {summaryType};
-		//setSummaryType[0] = summaryType;
+		Integer[] setSummaryType =  {summaryType}; // Make summary type information mutable
 		
 		if (sortedDocument.size() > 0){
 				for (int i = 0; i <= sortedDocument.size() -1; i++) {
@@ -542,7 +539,6 @@ public class search {
 					documentPosition[0] = sortedDocument.get(i).getDocumentPosition();
 					documentNo[0] = sortedDocument.get(i).getDocNum();
 					termLocations.clear();
-					//System.out.println("documentPosition: "+documentPosition[0]);
 					
 					try (Stream<String> lines = Files.lines(Paths.get(sourcefile))) {
 							boolean[] openHeadlineTag = {false};
@@ -551,6 +547,16 @@ public class search {
 							Integer[] currentLine = {documentPosition[0]};
 							
 							boolean[] doNotProcess = {false};
+							
+							/* I make use of the Stream because of efficiency. One of the limitations
+							 * (which play a role in the efficiency) is that you can only operate on a 
+							 * stream once. We can obviously use a forEach loop to kind-of get around this as
+							 * seen below. But I could not figure out a way to break out of the forEach.
+							 * Even though it is fast (we don't do anymore operations after we are done to speed it up),
+							 * We could have significantly sped up the operation even more by breaking out if lets say,
+							 * we get the first 5 sentences we need. The function and infrastructure for this
+							 * is already setup, but we simply could not get it to break out after it was done.
+							 */
 							
 						lines.skip(documentPosition[0]).forEach((line) -> {
 						
@@ -566,25 +572,13 @@ public class search {
 						String closeText = "</TEXT>";
 						
 						String closeDoc = "</DOC>";
-						
-						/*if (currentLine[0] == documentPosition[0])
-							System.out.println("First ever line: "+line);*/
-						
-						//while (true) {
-							//String line = br.readLine();
-							
-							if (line == null) {
-								//doNotProcess[0] = true;
-								//return; //throw new Exception();
-							}
 							
 							if (line.equals(closeDoc) && processThisDocument[0]) {
 								doNotProcess[0] = true;
-								//System.out.println("Close: "+line);
-								//return;//throw new Exception();
+								//return; //break;
 							}
 							
-							// add Document to ArrayList
+							// Double check that this is our document
 							Pattern pattern = Pattern.compile("<DOCNO>(.*?)</DOCNO>");
 							Matcher m = pattern.matcher(line);
 							if(m.find()){
@@ -627,15 +621,8 @@ public class search {
 									}
 									} else {
 										if (!doNotProcess[0]) {
-											//System.out.println("Gets here: "+line);
 										for (int j = 0; j < searchTerms.length; j++) {
 											int wordLocation = line.toLowerCase().indexOf(searchTerms[j]);
-											
-											// Also check the rest of the sentence incase it occurs more than once in the sentence
-											/*while (wordLocation >= 0) {
-												termLocations.add(linesProcessed[0]-1);
-												wordLocation = summaryText[0].toLowerCase().indexOf(searchTerms[j], wordLocation+1);
-											}*/
 											
 											if (wordLocation != -1)
 												termLocations.add(linesProcessed[0]);
@@ -653,9 +640,6 @@ public class search {
 							}
 							
 							currentLine[0]++;
-							
-							//line = lines.skip(currentLine).findFirst().get();
-							
 						//}
 						});
 					
@@ -664,42 +648,34 @@ public class search {
 						e.printStackTrace();
 					}
 					
+					/* This is for just getting first sentences. We are just going to highlight words of interest
+					 * if they exist within the 5 sentences
+					 */
 					if (setSummaryType[0] == 1) {
 						
 						for (int m = 0; m < searchTerms.length; m++) {
 							String term = searchTerms[m];
 							int wordLocation = summaryText[0].toLowerCase().indexOf(term);
-							//System.out.println("Index of term: "+wordLocation);
 							while (wordLocation >= 0) {
 								StringBuilder input = new StringBuilder(summaryText[0]);
 								input.insert(wordLocation+term.length(), "\033[0;0m"); // Start with the end of the word;
 								input.insert(wordLocation, "\033[0;1m"); // End with with start of the word
-								//input.insert(wordLocation+term.length(), "hi");
 								summaryText[0] = input.toString();
 								int jumpTo = wordLocation+("\033[0;0m"+term+"\033[0;0m").length(); // Take into account the new chars
 								wordLocation = summaryText[0].toLowerCase().indexOf(term, jumpTo+1);
 							}
 						}
-						
-						/*String term = searchTerms[0];
-					int wordLocation = summaryText[0].toLowerCase().indexOf(term);
-					//System.out.println("Index of term: "+summaryText[0].length());
-					if (wordLocation != -1) {
-						StringBuilder input = new StringBuilder(summaryText[0]);
-						input.insert(wordLocation+term.length(), "\033[0;0m"); // Start with the end of the word;
-						input.insert(wordLocation, "\033[0;1m"); // End with with start of the word
-						//input.insert(wordLocation+term.length(), "hi");
-						summaryText[0] = input.toString();
-					}*/
 					
-					sortedDocument.get(i).addSummary(summaryText[0]);
-					} else {
+					sortedDocument.get(i).addSummary(summaryText[0]); // Addfinal summary
+					} else if (setSummaryType[0] == 2){
 						
+						// Option 2 (Query based summary)
 						
 						Collections.sort(termLocations);
 						
 						int startingLine = 0;
 						
+						//Try to move to the first sentence we are interested in
 						if (termLocations.size() > 0)
 							startingLine = termLocations.get(0);
 						else {
@@ -723,25 +699,8 @@ public class search {
 									 */
 								}
 						}
-						
-						
-					
-						
 						String[] allLines = summaryText[0].split("(?<=\r\n|\r|\n)"); // Split and Keep the delimiters for paragraphs
-						
 						summaryText[0] = "";
-						
-						//System.out.println("allLines 0: "+allLines[0]);
-						
-						//System.out.println("lines processed: "+linesProcessed[0]);
-						//System.out.println("lines length: "+allLines.length);
-						//System.out.println("lines 0: "+allLines.length);
-						
-						/* Check if the location we are starting the summary is near the end of the document.
-						 * If so, then we want to go back 4 sentences so that the summary has a bit of context.
-						 */
-						//System.out.println(" allLines: "+ allLines.length);
-						//System.out.println(" goBackTo: "+ goBackTo);
 						int goBackTo = allLines.length - 4;
 						int startingLineUpperPosition = startingLine-4;
 						
@@ -763,10 +722,6 @@ public class search {
 							}
 						}
 						
-						
-						//System.out.println("summaryText 0: "+summaryText[0]);
-						
-						
 						for (int m = 0; m < searchTerms.length; m++) {
 							String term = searchTerms[m];
 							int wordLocation = summaryText[0].toLowerCase().indexOf(term);
@@ -782,7 +737,7 @@ public class search {
 						
 							
 						
-						sortedDocument.get(i).addSummary("..."+summaryText[0]);
+						sortedDocument.get(i).addSummary("..."+summaryText[0]); // Add summary
 					}
 					
 					
