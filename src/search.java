@@ -703,7 +703,7 @@ public class search {
 						if (termLocations.size() > 0)
 							startingLine = termLocations.get(0);
 						else {
-							System.out.println("Could not find word in document: "+documentNo[0]);
+							System.out.println("\033[0;1m Summary based on context was not successful due to the word(s) of interest only occuring in the header or equivalent in document: : "+documentNo[0]+"\033[0;0m \n");
 						}
 						
 						
@@ -775,7 +775,7 @@ public class search {
 								input.insert(wordLocation+term.length(), "\033[0;0m"); // Start with the end of the word;
 								input.insert(wordLocation, "\033[0;1m"); // End with with start of the word
 								summaryText[0] = input.toString();
-								int jumpTo = wordLocation+("\033[0;0m"+term+"\033[0;0m").length(); // Take into account the new chars
+								int jumpTo = wordLocation+("\033[0;0m"+term+"\033[0;1m").length(); // Take into account the new chars
 								wordLocation = summaryText[0].toLowerCase().indexOf(term, jumpTo+1);
 							}
 						}
