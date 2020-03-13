@@ -1,6 +1,6 @@
 # Information-Retrieval
 
-Contributors:
+Contributors:  
 Anesu Chiodze  
 Shuijia Zhuo  
 
