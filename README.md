@@ -1,8 +1,8 @@
 # Information-Retrieval
 
-Student Name&ID:
-Anesu Chiodze s3542943
-Shuijia Zhuo s3384039
+Contributors:
+Anesu Chiodze  
+Shuijia Zhuo  
 
 How to compile and run:
 
